@@ -1,5 +1,7 @@
 
-import sqljet;
+import org.tmatesoft.sqljet.core.*;
+import org.tmatesoft.sqljet.browser.*;
+import org.antlr.runtime.*;
 
 public class Listener {
 

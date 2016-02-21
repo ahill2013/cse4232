@@ -58,10 +58,18 @@ public class Handler {
 
 
         Parser parseArgs = new Parser(setArgs());
-        LogicEngine engine = new LogicEngine();
-
-
+        LogicEngine engine;
         CommandLine cmd;
+
+        try {
+            cmd = parseArgs.getCMD(args);
+            engine = new LogicEngine(cmd.getOptionValue("d"));
+        } catch (ParseException e) {
+            System.err.println(cmd.getOptions());
+            e.printStackTrace();
+        }
+
+
         ServerSocket port;
         Socket client;
         BufferedReader reader;
@@ -69,6 +77,7 @@ public class Handler {
 
         try {
             cmd = parseArgs.getCMD(args);
+            engine = new LogicEngine(cmd.)
             port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
 
             client = port.accept();

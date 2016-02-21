@@ -29,14 +29,18 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+
 import java.net.Socket;
 import java.net.ServerSocket;
+
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 
 
 public class Handler {
     private static LinkedList<String[]> setArgs() {
         LinkedList<String[]> arguments = new LinkedList<>();
+
 
         final String[] arg1 = {"p", "true", "specify port number"};
         final String[] arg2 = {"d", "true", "specify database location"};
@@ -54,13 +58,27 @@ public class Handler {
 
 
         Parser parseArgs = new Parser(setArgs());
+        LogicEngine engine = new LogicEngine();
+
+
+        CommandLine cmd;
+        ServerSocket port;
+        Socket client;
+        BufferedReader reader;
+        BufferedWriter writer;
+
         try {
-            CommandLine cmd = parseArgs.getCMD(args);
-            ServerSocket port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
+            cmd = parseArgs.getCMD(args);
+            port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
+
+            client = port.accept();
+            reader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8"));
+            writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream(), "UTF-8"));
 
             while (true) {
-                Socket client = port.accept();
 
+                String[] input = reader.readLine().split(";");
+                String output = engine.response(input);
             }
 
         } catch (ParseException e) {

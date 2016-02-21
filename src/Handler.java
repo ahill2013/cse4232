@@ -46,23 +46,33 @@ public class Handler {
 
     }
     public static void main(final String [] args) {
-        Parser parseArgs = new Parser(setArgs());
-        try {
-            CommandLine cmd = parseArgs.getCMD(args);
 
-        } catch (ParseException e) {
-            System.out.println("Illegal argument format");
-            e.printStackTrace();
-        }
-        if (args.length != 1) {
+        if (args.length < 1) {
             System.err.println("Usage: run.sh <port number>");
             System.exit(1);
         }
 
-        int portNum = Integer.parseInt(args[0]);
+
+        Parser parseArgs = new Parser(setArgs());
+        try {
+            CommandLine cmd = parseArgs.getCMD(args);
+            ServerSocket port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
+
+            while (true) {
+                Socket client = port.accept();
+
+            }
+
+        } catch (ParseException e) {
+            System.out.println("Illegal argument format");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Illegal port number");
+            e.printStackTrace();
+        }
 
         //OutputStream out;
-        String input;
+        /*String input;
         BufferedReader reader;
         BufferedWriter out;
 
@@ -88,7 +98,7 @@ public class Handler {
         }catch (IOException e) {
             System.out.println("IOExeption caught listening to port " + portNum);
             System.out.println(e.getMessage());
-        }
+        }*/
     }
 
 

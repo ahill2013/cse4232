@@ -1,7 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by armin1215 on 2/21/16.
@@ -9,14 +7,21 @@ import java.nio.file.Paths;
 
 
 public class LogicEngine {
-    BackEnd be = new BackEnd();
+    private BackEnd be;
+    private File dbFile;
 
     public LogicEngine(String dbLocation) throws FileNotFoundException {
-        Path p = new Paths.get(dbLocation);
+        dbFile = new File(dbLocation);
+        be = new BackEnd(dbFile);
     }
+
     public String response(String[] in) {
         StringBuilder out = new StringBuilder();
 
         return out.toString();
+    }
+
+    private String parseInput(String[] in) {
+        return null;
     }
 }

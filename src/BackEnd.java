@@ -1,29 +1,33 @@
 /**
  * Created by armin1215 on 2/21/16.
  */
-
-import org.tmatesoft.sqljet.core.*;
-import org.tmatesoft.sqljet.core.table.*;
-import org.tmatesoft.sqljet.core.table.SqlJetDb;
-
 import java.io.File;
+import java.sql.*;
+import org.sqlite.JDBC;
 
 public class BackEnd {
-    SqlJetDb db;
+    Connection db;
     public BackEnd(File dbFile) {
-        try {
-            db = SqlJetDb.open(dbFile, true);
-        } catch (SqlJetException e) {
-            System.err.println("Failed to open DB");
-            e.printStackTrace();
-        }
+        db = openConnection();
     }
 
-    /*public boolean createProject() {
+    public String createProject() {
+        return null;
+    }
 
-    }*/
+    public String retrieveData() {
+        return null;
+    }
+    private Connection openConnection() {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection("jdbc:sqlite:projects.db");
 
-
-
+        } catch (SQLException e) {
+            System.err.println("Failed to open database");
+            e.printStackTrace();
+        }
+        return conn;
+    }
 
 }

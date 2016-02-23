@@ -17,23 +17,12 @@
 /* ------------------------------------------------------------------------- */
 
 import org.apache.commons.cli.*;
-import org.tmatesoft.sqljet.core.*;
-import org.tmatesoft.sqljet.browser.*;
-import org.antlr.runtime.*;
 
-import java.io.IOException;
-import java.io.FileNotFoundException;
-
-//import java.io.OutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 import java.net.Socket;
 import java.net.ServerSocket;
 
-import java.nio.charset.Charset;
 import java.util.LinkedList;
 
 
@@ -65,7 +54,10 @@ public class Handler {
             cmd = parseArgs.getCMD(args);
             engine = new LogicEngine(cmd.getOptionValue("d"));
         } catch (ParseException e) {
-            System.err.println(cmd.getOptions());
+            System.err.println("Illegal argument entered");
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found");
             e.printStackTrace();
         }
 
@@ -75,9 +67,9 @@ public class Handler {
         BufferedReader reader;
         BufferedWriter writer;
 
-        try {
+        /*try {
             cmd = parseArgs.getCMD(args);
-            engine = new LogicEngine(cmd.)
+            engine = new LogicEngine(cmd.);
             port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
 
             client = port.accept();
@@ -96,7 +88,7 @@ public class Handler {
         } catch (IOException e) {
             System.out.println("Illegal port number");
             e.printStackTrace();
-        }
+        } */
 
         //OutputStream out;
         /*String input;

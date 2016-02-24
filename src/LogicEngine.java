@@ -12,7 +12,7 @@ public class LogicEngine {
 
     public LogicEngine(String dbLocation) throws FileNotFoundException {
         dbFile = new File(dbLocation);
-        be = new BackEnd(dbFile);
+        //be = new BackEnd(dbFile);
     }
 
     public String response(String[] in) {

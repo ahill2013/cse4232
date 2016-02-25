@@ -41,7 +41,7 @@ public class LogicEngine {
 
     }
 
-    public String parseInput(String input) {
+    public String parseInput(String input, String IP, int port) {
 
         String[] splitInput = input.split(";");
         String[] commandArg = splitInput[0].split(":");

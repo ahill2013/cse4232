@@ -30,14 +30,14 @@ public class BackEnd {
         _dbFile = dbPath;
     }
 
-    public void createProject(Connection conn, int ID, String projectName, int tasks) {
+    public void createProject(Connection conn, String projectName, int tasks) {
 //        String table = "ERROR";
 //        String createProject = "CREATE TABLE IF NOT EXISTS " + projectName +
 //                "(NAME TEXT NOT NULL, TASKS INT NOT NULL)";
 
 
         try {
-            String addProjectName = "INSERT OR REPLACE INTO PROJECTS_LIST(ID, NAME, TASKS) VALUES('" + ID + "','" + projectName + "','" + tasks + "')";
+            String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "','" + tasks + "')";
             Statement create = conn.createStatement();
 //            create.execute(createProject);
             create.executeUpdate(addProjectName);
@@ -49,7 +49,8 @@ public class BackEnd {
                 conn.commit();
 
                 final String createTable = "CREATE TABLE " + taskTable +
-                        "(NAME TEXT NOT NULL, PARENT TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL)";
+                        "(NAME TEXT NOT NULL, PARENT TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
+                        "IP TEXT NOT NULL, PORT INT NOT NULL, STATUS INT NOT NULL)";
                 create.execute(createTable);
                 conn.commit();
             }
@@ -61,7 +62,7 @@ public class BackEnd {
     }
 
     public void removeProject(Connection conn, String projectName) {
-        removeTask(conn, getTaskTable(projectName));
+        removeTasks(conn, getTaskTable(projectName));
         String query = "DELETE FROM PROJECTS_LIST WHERE " + projectName;
         try {
             Statement state = conn.createStatement();
@@ -72,20 +73,29 @@ public class BackEnd {
 
     }
 
-    public void removeTask(Connection conn, String taskName) {
+    public void removeTasks(Connection conn, String projectName) {
         try {
-            String query = "DROP TABLE IF EXISTS " + getTaskTable(taskName);
+            String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);
             Statement state = conn.createStatement();
             state.execute(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
-    public void insertTask(Connection conn, String projectName, String task, String start, String end) {
-        String addTask = "INSERT INTO " + getTaskTable(projectName) + "(NAME, PARENT, START, END) VALUES('" +
-                task + "','" + projectName + "','" + start + "','" + end + "')";
+    public void removeTask(Connection conn, String projectName, String task) {
+        try {
+            String query = "DELETE FROM " + getTaskTable(projectName) + " WHERE NAME = '" + task + "'";
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertTask(Connection conn, String projectName, String task, String start, String end, String IP, String port) {
+        String addTask = "INSERT OR REPLACE INTO " + getTaskTable(projectName) + "(NAME, PARENT, START, END, IP, PORT, STATUS) VALUES('" +
+                task + "','" + projectName + "','" + start + "','" + end + "','" + IP + "','" + port + "','" + 0 + "')";
         try {
             Statement state = conn.createStatement();
             state.executeUpdate(addTask);
@@ -95,9 +105,19 @@ public class BackEnd {
         }
     }
 
-    public String[][] getTasks(String projectName) {
-        return null;
-    }
+    /*public String[] getTask(Connection conn, String projectName, String task) {
+        try {
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM " + getTaskTable(projectName)
+                    + " WHERE NAME = '" + task + "'");
+            StringBuilder s = new StringBuilder();
+
+            for (int i = 1; )
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }*/
 
     private String getTaskTable(String projectName) {
         return projectName + "_tasks";
@@ -112,19 +132,17 @@ public class BackEnd {
 
     private void openDatabase(String dbFile) {
         Connection conn = null;
-        String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (ID INT NOT NULL, NAME TEXT NOT NULL, TASKS INT NOT NULL)";
+        String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
         try {
             //TODO check how DriverManager will manage paths to files/folders
             conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
             conn.setAutoCommit(false);
+
             Statement state = conn.createStatement();
             state.execute(pub);
             conn.commit();
-            // ResultSet rs = state.executeQuery("SELECT NAME FROM sqlite_master WHERE type='table'");
-            /*while (rs.next()) {
-                System.out.println(rs.getString("NAME"));
-            }*/
             conn.close();
+
         } catch (SQLException e) {
             System.err.println("Failed to open database");
             e.printStackTrace();
@@ -162,7 +180,35 @@ public class BackEnd {
             ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("NAME"));
-                System.out.println(resultSet.getInt("ID"));
+                //System.out.println(resultSet.getString("ID"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void printRowsInTable(Connection conn, String tableName, boolean project_list) {
+        try {
+            String table = tableName;
+            if (!project_list) {
+                table = getTaskTable(tableName);
+            }
+
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM " + table);
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columns = rsmd.getColumnCount();
+
+            for (int i = 1; i <= columns; i++) {
+                System.out.println(rsmd.getColumnName(i));
+            }
+
+            while (resultSet.next()) {
+                StringBuilder flash = new StringBuilder();
+                for (int i = 1; i <= columns; i++) {
+                    flash.append(resultSet.getString(i) + " ");
+                }
+                System.out.println(flash);
             }
         } catch (SQLException e) {
             e.printStackTrace();

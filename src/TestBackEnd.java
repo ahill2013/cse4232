@@ -18,7 +18,7 @@ public class TestBackEnd {
         }
         int tasks = 2;
         String project = "Testing";
-        be.createProject(conn, 1, project, 2);
+        be.createProject(conn, project, 2);
         String buy = "Buy paper";
         String start_buy = "2016-03-12:18h30m00s001Z";
         String end_buy = "2016-03-15:18h30m00s001Z";
@@ -27,11 +27,16 @@ public class TestBackEnd {
         String start_write = "2016-03-15:18h30m00s001z";
         String end_write = "2016-03-15:18h30m00s001z";
 
-        be.insertTask(conn, project, buy, start_buy, end_buy);
-        be.insertTask(conn, project, write, start_write, end_write);
+        String IP = "127.0.0.1";
+        int port = 2356;
+
+        be.insertTask(conn, project, buy, start_buy, end_buy, IP, port);
+        be.insertTask(conn, project, write, start_write, end_write, IP, port);
 
         be.printAllProjects(conn);
         be.printAllTables(conn);
+
+        be.printRowsInTable(conn, project, false);
 
         try {
             be.closeConnection(conn);

@@ -1,3 +1,4 @@
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -6,10 +7,18 @@ import java.sql.SQLException;
 public class TestBackEnd {
 
     public static void main(final String[] args) {
+
         BackEnd be = new BackEnd("/home/armin1215/Networks/test.db");
+        Connection conn = null;
+        try {
+            conn = be.openConnection();
+        } catch (SQLException e) {
+            System.exit(1);
+            e.printStackTrace();
+        }
         int tasks = 2;
         String project = "Testing";
-        be.createProject(project, 2);
+        be.createProject(conn, project, 2);
         String buy = "Buy paper";
         String start_buy = "2016-03-12:18h30m00s001Z";
         String end_buy = "2016-03-15:18h30m00s001Z";
@@ -18,11 +27,17 @@ public class TestBackEnd {
         String start_write = "2016-03-15:18h30m00s001z";
         String end_write = "2016-03-15:18h30m00s001z";
 
-        be.insertTask(project, buy, start_buy, end_buy);
-        be.insertTask(project, write, start_write, end_write);
+        be.insertTask(conn, project, buy, start_buy, end_buy);
+        be.insertTask(conn, project, write, start_write, end_write);
 
-        be.printAllProjects();
-        be.printAllTables();
+        be.printAllProjects(conn);
+        be.printAllTables(conn);
+
+        try {
+            be.closeConnection(conn);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         /*try {
             be.conn.close();
         } catch (SQLException e) {

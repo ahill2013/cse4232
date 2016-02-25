@@ -12,14 +12,14 @@ public class BackEnd {
         _dbFile = dbPath;
     }
 
-    public void createProject(Connection conn, String projectName, int tasks) {
+    public void createProject(Connection conn, int ID, String projectName, int tasks) {
 //        String table = "ERROR";
 //        String createProject = "CREATE TABLE IF NOT EXISTS " + projectName +
 //                "(NAME TEXT NOT NULL, TASKS INT NOT NULL)";
 
 
         try {
-            String addProjectName = "INSERT OR REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "','" + tasks + "')";
+            String addProjectName = "INSERT OR REPLACE INTO PROJECTS_LIST(ID, NAME, TASKS) VALUES('" + ID + "','" + projectName + "','" + tasks + "')";
             Statement create = conn.createStatement();
 //            create.execute(createProject);
             create.executeUpdate(addProjectName);
@@ -37,6 +37,29 @@ public class BackEnd {
             }
         } catch (SQLException e) {
             System.err.println("Failed to create project");
+            e.printStackTrace();
+        }
+
+    }
+
+    public void removeProject(Connection conn, String projectName) {
+        removeTask(conn, getTaskTable(projectName));
+        String query = "DELETE FROM PROJECTS_LIST WHERE " + projectName;
+        try {
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void removeTask(Connection conn, String taskName) {
+        try {
+            String query = "DROP TABLE IF EXISTS " + getTaskTable(taskName);
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -63,7 +86,7 @@ public class BackEnd {
     }
 
 
-    public String retrieveData() {
+    public String retrieveTasks() {
         return null;
     }
 
@@ -71,7 +94,7 @@ public class BackEnd {
 
     private void openDatabase(String dbFile) {
         Connection conn = null;
-        String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT NOT NULL, TASKS INT NOT NULL)";
+        String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (ID INT NOT NULL, NAME TEXT NOT NULL, TASKS INT NOT NULL)";
         try {
             //TODO check how DriverManager will manage paths to files/folders
             conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
@@ -107,7 +130,6 @@ public class BackEnd {
             while (tables.next()) {
                 String name = tables.getString("NAME");
                 System.out.println(name);
-//                ResultSet rows = create.executeQuery("SELECT Count(*) FROM " + name);
 //                String query = "SELECT Count(*) FROM " + name;
                 //System.out.println(rows);
             }
@@ -122,10 +144,18 @@ public class BackEnd {
             ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("NAME"));
+                System.out.println(resultSet.getInt("ID"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getI(Connection conn) throws SQLException {
+        Statement state = conn.createStatement();
+        ResultSet rows = state.executeQuery("SELECT Count(*) FROM PROJECTS_LIST");
+        rows.next();
+        return Integer.parseInt(rows.getString(1));
     }
 
 

@@ -18,7 +18,7 @@ public class TestBackEnd {
         }
         int tasks = 2;
         String project = "Testing";
-        be.createProject(conn, project, 2);
+        be.createProject(conn, 1, project, 2);
         String buy = "Buy paper";
         String start_buy = "2016-03-12:18h30m00s001Z";
         String end_buy = "2016-03-15:18h30m00s001Z";

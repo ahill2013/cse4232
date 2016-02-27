@@ -16,15 +16,15 @@ public class TestLogicEngine {
             String projectCreation = engine.parseInput("PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;" +
                     "Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;",
                     "127.0.0.1", 2356);
-            System.out.println(projectCreation);
+            System.out.print(projectCreation);
             String ownerCreation = engine.parseInput("TAKE;USER:Johny;PROJECT:Exam;Buy paper", "127.0.0.1", 2356);
-            System.out.println(ownerCreation);
+            System.out.print(ownerCreation);
 
             String getProjects = engine.parseInput("GET_PROJECTS", "127.0.0.1", 2356);
-            System.out.println(getProjects);
+            System.out.print(getProjects);
 
             String listTasks = engine.parseInput("GET_PROJECT;Exam", "127.0.0.1", 2356);
-            System.out.println(listTasks);
+            System.out.print(listTasks);
 
             engine.printDatabase();
             engine.closeLogicEngine();

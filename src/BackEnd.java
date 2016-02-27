@@ -36,7 +36,7 @@ import java.util.LinkedList;
 
 public class BackEnd {
     private static final String PROJECTS = "PROJECTS_LIST";
-    private static final int TASKLISTSIZE = 8;
+    private static final int TASKLISTSIZE = 7;
     String _dbFile;
 
     public BackEnd(String dbPath) {
@@ -44,7 +44,7 @@ public class BackEnd {
         _dbFile = dbPath;
     }
 
-    public void createProject(Connection conn, String projectName, int tasks) {
+    public boolean createProject(Connection conn, String projectName, int tasks) {
         try {
             String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "','" + tasks + "')";
             Statement create = conn.createStatement();
@@ -57,16 +57,16 @@ public class BackEnd {
                 conn.commit();
 
                 final String createTable = "CREATE TABLE " + taskTable +
-                        "(NAME TEXT NOT NULL, PARENT TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
+                        "(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
                 create.execute(createTable);
                 conn.commit();
             }
         } catch (SQLException e) {
-            System.err.println("Failed to create project");
-            e.printStackTrace();
+//            e.printStackTrace();
+            return false;
         }
-
+        return true;
     }
 
     LinkedList<String> getAllProjects(Connection conn) {
@@ -79,7 +79,8 @@ public class BackEnd {
                 projects.addLast(resultSet.getString("NAME"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            projects = new LinkedList<>();
+            projects.add("Failure");
         }
 
         return projects;
@@ -98,26 +99,6 @@ public class BackEnd {
         }
     }
 
-    public void removeTasks(Connection conn, String projectName) {
-        try {
-            String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);
-            Statement state = conn.createStatement();
-            state.execute(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void removeTask(Connection conn, String projectName, String task) {
-        try {
-            String query = "DELETE FROM " + getTaskTable(projectName) + " WHERE NAME = '" + task + "'";
-            Statement state = conn.createStatement();
-            state.execute(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void setStatus(Connection conn, String project, String task, int status) {
         try {
             String query = "UPDATE " + getTaskTable(project) + " SET STATUS = " + status + " WHERE NAME = '" + task + "'";
@@ -128,28 +109,29 @@ public class BackEnd {
         }
     }
 
-    public void setUser(Connection conn, String project, String task, String user) {
+    public boolean setUser(Connection conn, String project, String task, String user) {
         try {
             String query = "UPDATE " + getTaskTable(project) + " SET OWNER = '" + user + "' WHERE NAME = '" + task + "'";
             Statement create = conn.createStatement();
             create.executeUpdate(query);
         } catch (SQLException e) {
-            System.err.println("Failed to add user");
-            e.printStackTrace();
+//            e.printStackTrace();
+            return false;
         }
-
+        return true;
     }
 
-    public void insertTask(Connection conn, String projectName, String task, String start, String end, String IP, int port) {
-        String addTask = "INSERT OR REPLACE INTO " + getTaskTable(projectName) + "(NAME, PARENT, START, END, STATUS, IP, PORT) VALUES('" +
-                task + "','" + projectName + "','" + start + "','" + end + "','" + 0 + "','" + IP + "','" + port + "')";
+    public boolean insertTask(Connection conn, String projectName, String task, String start, String end, String IP, int port) {
+        String addTask = "INSERT OR REPLACE INTO " + getTaskTable(projectName) + "(NAME, START, END, STATUS, IP, PORT) VALUES('" +
+                task + "','" + start + "','" + end + "','" + 0 + "','" + IP + "','" + port + "')";
         try {
             Statement state = conn.createStatement();
             state.executeUpdate(addTask);
         } catch (SQLException e) {
-            System.err.println("Failed to insert task" + projectName + " " + " " + task + " " + start + " " + end);
-            e.printStackTrace();
+//            e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     public LinkedList<String[]> getTasks(Connection conn, String project) {
@@ -163,34 +145,19 @@ public class BackEnd {
             while (resultSet.next()) {
                 String[] task = new String[columns];
                 for (int i = 1; i <= columns; i++) {
+                    String result = resultSet.getString(i);
                     task[i -1] = resultSet.getString(i);
                 }
                 tasks.addLast(task);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            tasks = new LinkedList<>();
+            String[] f = new String[1];
+            f[0] = "Failure";
+            tasks.addFirst(f);
         }
         return tasks;
-    }
-
-    public String[] getTask(Connection conn, String projectName, String task) {
-        String[] retrievedTask = new String[TASKLISTSIZE];
-        try {
-            Statement create = conn.createStatement();
-            ResultSet resultSet = create.executeQuery("SELECT * FROM " + getTaskTable(projectName)
-                    + " WHERE NAME = '" + task + "'");
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            int columns = rsmd.getColumnCount();
-            for (int i = 1; i <= columns; i++) {
-                retrievedTask[i-1] = resultSet.getString(i);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.flush();
-        } finally {
-            return retrievedTask;
-        }
     }
 
     private String getTaskTable(String projectName) {
@@ -203,7 +170,6 @@ public class BackEnd {
         Connection conn = null;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
         try {
-            //TODO check how DriverManager will manage paths to files/folders
             conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
             conn.setAutoCommit(false);
 
@@ -298,5 +264,48 @@ public class BackEnd {
         }
     }
 
+    public void removeTasks(Connection conn, String projectName) {
+        try {
+            String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /*
+     * Cleaning the database if desired for testing
+     */
+    public void removeTask(Connection conn, String projectName, String task) {
+        try {
+            String query = "DELETE FROM " + getTaskTable(projectName) + " WHERE NAME = '" + task + "'";
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] getTask(Connection conn, String projectName, String task) {
+        String[] retrievedTask = new String[TASKLISTSIZE];
+        try {
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM " + getTaskTable(projectName)
+                    + " WHERE NAME = '" + task + "'");
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columns = rsmd.getColumnCount();
+            for (int i = 1; i <= columns; i++) {
+                retrievedTask[i-1] = resultSet.getString(i);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.flush();
+        }
+
+        return retrievedTask;
+    }
 
 }

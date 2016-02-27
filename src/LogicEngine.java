@@ -23,9 +23,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
 
 public class LogicEngine {
-    private BackEnd be;
+    BackEnd be;
     private Connection conn;
     private File dbFile;
 
@@ -42,34 +46,208 @@ public class LogicEngine {
     }
 
     public String parseInput(String input, String IP, int port) {
+        StringBuilder output = new StringBuilder();
+        String[] commands = input.split(";");
 
-        String[] splitInput = input.split(";");
-        String[] commandArg = splitInput[0].split(":");
-        switch (commandArg[0]) {
-            case "PROJECT_DEFINITION":
-                String[] numtaskArg = splitInput[1].split(":");
-                be.createProject(conn, commandArg[1], Integer.parseInt(numtaskArg[1]));
-                int inputCount = 3;
-                for (int i=0; i<Integer.parseInt(numtaskArg[1]); i++)
-                    //be.insertTask(conn, commandArg[1], splitInput[inputCount++], splitInput[inputCount++], splitInput[inputCount++]);
-                break;
-            case "TAKE":
-                String[] userArg = splitInput[1].split(":");
-                String[] projectArg = splitInput[2].split(":");
-                // TODO Implement function for taking tasks in BackEnd
-                //be.takeTask(conn, userArg[1], projectArg[1], splitInput[3]);
-                break;
-            case "GET_PROJECTS":
-                be.printAllProjects(conn);
-                break;
-            case "GET_PROJECT":
-                //be.getTasks(commandArg[1]);
-                break;
-            default:
-                System.err.println("ERROR: Invalid Command");
+        int commandsLength = commands.length;
+        if (commands[commandsLength - 1].equals("")) {
+            commandsLength -= 1;
         }
 
-        return null;
+        boolean _failure = false;
+        int index = 0;
+        while (index < commandsLength && !_failure) {
+            String[] commandArg = commands[index].split(":");
+            switch (commandArg[0]) {
+                case "PROJECT_DEFINITION":
+
+                    String name = commandArg[1];
+                    // Get the number of tasks
+                    int commandIndex = index;
+
+
+                    int numIndex = index + 1;
+                    int tasksIndex = index + 2;
+                    int numTasks = 0;
+
+                    // If there is a project definition and nothing after it
+                    if (numIndex < commandsLength) {
+                        try {
+                            numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
+                        } catch (Exception e) {
+                            failureFormat(output, commands, commandsLength, index);
+                        }
+                    } else {
+                        failureFormat(output, commands, commandsLength, index);
+                        _failure = true;
+                        break;
+                    }
+
+                    if ((tasksIndex + 3*numTasks) > commandsLength) {
+                        failureFormat(output, commands, commandsLength, index);
+                        _failure = true;
+                        break;
+                    }
+
+                    //create project with name and tasks and implicit task table if number of task is greater than zero
+                    boolean projectCreated = be.createProject(conn, commandArg[1], numTasks);
+                    boolean taskCreated = true;
+
+                    if (projectCreated) {
+
+                        for (int i = 0; i < numTasks; i++) {
+                            taskCreated = be.insertTask(conn, name, commands[tasksIndex], commands[tasksIndex + 1], commands[tasksIndex + 2], IP, port);
+                            tasksIndex += 3;
+                            if (!taskCreated) {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (projectCreated && taskCreated) {
+                        appendOutput(output, "OK");
+                        projectOutput(output, commands, index, tasksIndex);
+                    } else {
+                        failureFormat(output, commands, commandsLength, index);
+                        _failure = true;
+                    }
+
+                    index = tasksIndex;
+                    break;
+                case "TAKE":
+                    String userArg = commands[index + 1].split(":")[1];
+                    String projectArg = commands[index + 2].split(":")[1];
+                    String task = commands[index + 3];
+
+                    if ((index + 3) > commandsLength) {
+                        appendOutput(output, "Fail");
+                        for (int i = index; i < commandsLength; i++) {
+                            appendOutput(output, commands[index]);
+                        }
+                        _failure = true;
+                    }
+
+                    if (be.setUser(conn, projectArg, task, userArg)) {
+                        appendOutput(output, "OK");
+                        appendOutput(output, commands[index + 1]);
+                        appendOutput(output, commands[index + 2]);
+                        appendOutput(output, commands[index + 3]);
+                    } else {
+                        failureFormat(output, commands, commandsLength, index);
+                    }
+
+                    index += 4;
+                    break;
+                case "GET_PROJECTS":
+                    LinkedList<String> projects = be.getAllProjects(conn);
+
+                    if (projects.peekFirst().equals("Failure")) {
+                        failureFormat(output, commands, commandsLength, index);
+                        _failure = true;
+                    } else {
+                        appendOutput(output, "OK");
+                        appendOutput(output, "PROJECTS: " + projects.size());
+                        for (String project : projects) {
+                            appendOutput(output, project);
+                        }
+                    }
+                    index += 1;
+                    break;
+                case "GET_PROJECT":
+                    if ((index + 1) > commandsLength) {
+                        appendOutput(output, "Fail");
+                        appendOutput(output, commands[index]);
+                        _failure = true;
+                    } else {
+                        String project = commands[index + 1];
+                        LinkedList<String[]> tasks = be.getTasks(conn,project);
+                        if (tasks.peek()[0].equals("Failure")) {
+                            failureFormat(output, commands, commandsLength, index);
+                            _failure = true;
+                        } else {
+                            if (checkStatus(project, tasks)) {
+                                tasks = be.getTasks(conn, project);
+                                appendOutput(output, "OK");
+                                appendOutput(output, "PROJECT_DEFINITION:" + commands[index + 1]);
+                                appendOutput(output, "TASKS:" + tasks.size());
+
+                                for (String[] part : tasks) {
+
+                                    if (part[3] == null) {
+                                        part[3] = "";
+                                    }
+                                    if (Integer.parseInt(part[6]) == 0) {
+                                        appendOutput(output, part[0]); // Name
+                                        appendOutput(output, part[1]); // Start
+                                        appendOutput(output, part[2]); // End
+                                        appendOutput(output, part[3]); // Owner
+                                        appendOutput(output, part[4]); // IP
+                                        appendOutput(output, part[5]); // Port
+                                        appendOutput(output, "Waiting"); // Status
+                                    } else {
+                                        appendOutput(output, part[0]);
+                                        // Start is not output if task is complete
+                                        appendOutput(output, part[2]);
+                                        appendOutput(output, part[3]);
+                                        appendOutput(output, part[4]);
+                                        appendOutput(output, part[5]);
+                                        appendOutput(output, "Done");
+                                    }
+                                }
+                            } else {
+                                failureFormat(output, commands, commandsLength, index);
+                                _failure = true;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    failureFormat(output, commands, commandsLength, index);
+                    _failure = true;
+            }
+        }
+        output.append("\n");
+        return output.toString();
+    }
+
+    //Do not use for anyone else
+    private void projectOutput(StringBuilder output, String[] commands, int index, int tasksIndex) {
+        for (int i = index; i < tasksIndex; i++) {
+            appendOutput(output, commands[i]);
+        }
+    }
+
+    private void failureFormat(StringBuilder output, String[] commands, int commandsLength, int index) {
+        appendOutput(output, "Fail");
+        for (int i = index; i < commandsLength; i++) {
+            appendOutput(output, commands[i]);
+        }
+    }
+
+    private boolean checkStatus(String project, LinkedList<String[]> tasks) {
+        for (String[] part : tasks) {
+            if (Integer.parseInt(part[6]) == 0) {
+                int done = isDone(part[2]);
+                if (done == 1) {
+                    be.setStatus(conn, project, part[0], done);
+                } else if (done == Integer.MAX_VALUE) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private int isDone(String end) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss.SSS'Z'");
+            Date endTime = dateFormat.parse(end);
+            Date current = new Date();
+            return endTime.compareTo(current);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Integer.MAX_VALUE;
+        }
     }
 
     public void closeLogicEngine() {
@@ -81,4 +259,15 @@ public class LogicEngine {
         }
     }
 
+    public static void appendOutput(StringBuilder output, String append) {
+        if (output.length() > 0) {
+            output.append(";");
+        }
+        output.append(append);
+    }
+
+    public void printDatabase() {
+        be.printAllProjects(conn);
+        be.printAllTables(conn);
+    }
 }

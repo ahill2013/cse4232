@@ -11,13 +11,22 @@ public class TestLogicEngine {
     public static void main(final String[] args) {
 
         try {
-            LogicEngine engine = new LogicEngine("d");
+            LogicEngine engine = new LogicEngine("/home/armin1215/Networks/test.db");
 
-            //engine.parseInput("PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;2016-03-18:18h30m00s001Z;2016-03-15:20h30m00s001Z");
-            //engine.parseInput("TAKE;USER:Johny;PROJECT:Exam;Buy paper");
-            //engine.parseInput("GET_PROJECTS");
-            //engine.parseInput("GET_PROJECT;Exam");
+            String projectCreation = engine.parseInput("PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;" +
+                    "Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;",
+                    "127.0.0.1", 2356);
+            System.out.println(projectCreation);
+            String ownerCreation = engine.parseInput("TAKE;USER:Johny;PROJECT:Exam;Buy paper", "127.0.0.1", 2356);
+            System.out.println(ownerCreation);
 
+            String getProjects = engine.parseInput("GET_PROJECTS", "127.0.0.1", 2356);
+            System.out.println(getProjects);
+
+            String listTasks = engine.parseInput("GET_PROJECT;Exam", "127.0.0.1", 2356);
+            System.out.println(listTasks);
+
+            engine.printDatabase();
             engine.closeLogicEngine();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -51,7 +51,7 @@ public class LogicEngine {
                 be.createProject(conn, commandArg[1], Integer.parseInt(numtaskArg[1]));
                 int inputCount = 3;
                 for (int i=0; i<Integer.parseInt(numtaskArg[1]); i++)
-                    be.insertTask(conn, commandArg[1], splitInput[inputCount++], splitInput[inputCount++], splitInput[inputCount++]);
+                    //be.insertTask(conn, commandArg[1], splitInput[inputCount++], splitInput[inputCount++], splitInput[inputCount++]);
                 break;
             case "TAKE":
                 String[] userArg = splitInput[1].split(":");
@@ -63,7 +63,7 @@ public class LogicEngine {
                 be.printAllProjects(conn);
                 break;
             case "GET_PROJECT":
-                be.getTasks(commandArg[1]);
+                //be.getTasks(commandArg[1]);
                 break;
             default:
                 System.err.println("ERROR: Invalid Command");

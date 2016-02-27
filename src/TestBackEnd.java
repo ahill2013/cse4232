@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
 /**
  * Created by armin1215 on 2/23/16.
@@ -13,11 +14,11 @@ public class TestBackEnd {
         try {
             conn = be.openConnection();
         } catch (SQLException e) {
-            System.exit(1);
             e.printStackTrace();
+            System.exit(1);
         }
-        int tasks = 2;
-        String project = "Testing";
+        int num_tasks = 2;
+        String project = "Testing2";
         be.createProject(conn, project, 2);
         String buy = "Buy paper";
         String start_buy = "2016-03-12:18h30m00s001Z";
@@ -37,6 +38,23 @@ public class TestBackEnd {
         be.printAllTables(conn);
 
         be.printRowsInTable(conn, project, false);
+
+        be.setUser(conn, project, buy, "Johnny");
+        be.setUser(conn, project, write, "Mary");
+        be.setStatus(conn, project, buy, 1);
+
+        LinkedList<String> projects = be.getAllProjects(conn);
+        for (String proj : projects) {
+            System.out.println(proj);
+        }
+
+        LinkedList<String[]> tasks = be.getTasks(conn, project);
+        for (String[] task : tasks) {
+            for (String part : task) {
+                System.out.print(part + " ");
+            }
+            System.out.println();
+        }
 
         try {
             be.closeConnection(conn);

@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 /**
  * Created by adam on 2/24/16.
@@ -29,7 +30,7 @@ public class TestLogicEngine {
 
             engine.printDatabase();
             engine.closeLogicEngine();
-        } catch (FileNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

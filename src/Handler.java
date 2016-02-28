@@ -26,6 +26,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.ServerSocket;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 
 
@@ -55,7 +56,32 @@ public class Handler {
 
         try {
             cmd = parseArgs.getCMD(args);
+            //TODO:Make sure that any file works with the engine
+            //TODO:If given abbreviated file name, get full file path
             engine = new LogicEngine(cmd.getOptionValue("d"));
+
+            ServerSocket server = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
+
+            for(;;) {
+                Socket sock = server.accept();
+                String IP = sock.getInetAddress().toString();
+                int clientPort = sock.getPort();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+                String line = reader.readLine();
+                if (line==null) {
+                    break;
+                }
+                System.out.println(line);
+                String output = engine.parseInput(line, IP, clientPort);
+                System.out.println(output);
+                writer.write(output);
+                writer.flush();
+
+                sock.close();
+
+            }
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
@@ -64,13 +90,13 @@ public class Handler {
             System.err.println("File not found");
             e.printStackTrace();
             System.exit(-1);
+        } catch (IOException e) {
+            System.out.println("Problem connecting to socket");
+            e.printStackTrace();
+        }  catch (SQLException e) {
+            System.err.println("Could not access database. Does the program have write rights to the directory?");
+            System.exit(-1);
         }
-
-
-        ServerSocket port;
-        Socket client;
-        BufferedReader reader;
-        BufferedWriter writer;
 
         /*try {
             cmd = parseArgs.getCMD(args);

@@ -39,7 +39,7 @@ public class BackEnd {
     private static final int TASKLISTSIZE = 7;
     String _dbFile;
 
-    public BackEnd(String dbPath) {
+    public BackEnd(String dbPath) throws SQLException {
         openDatabase(dbPath);
         _dbFile = dbPath;
     }
@@ -166,22 +166,17 @@ public class BackEnd {
 
 
 
-    private void openDatabase(String dbFile) {
+    private void openDatabase(String dbFile) throws SQLException {
         Connection conn = null;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
-        try {
-            conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
-            conn.setAutoCommit(false);
 
-            Statement state = conn.createStatement();
-            state.execute(pub);
-            conn.commit();
-            conn.close();
+        conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+        conn.setAutoCommit(false);
 
-        } catch (SQLException e) {
-            System.err.println("Failed to open database");
-            e.printStackTrace();
-        }
+        Statement state = conn.createStatement();
+        state.execute(pub);
+        conn.commit();
+        conn.close();
     }
 
     public Connection openConnection() throws SQLException {

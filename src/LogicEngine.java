@@ -33,15 +33,10 @@ public class LogicEngine {
     private Connection conn;
     private File dbFile;
 
-    public LogicEngine(String dbLocation) throws FileNotFoundException {
+    public LogicEngine(String dbLocation) throws SQLException {
 
-        try {
-            be = new BackEnd(dbLocation);
-            conn = be.openConnection();
-
-        } catch (SQLException e) {
-            System.err.println("ERROR: SQL Exception in LogicEngine.java");
-        }
+        be = new BackEnd(dbLocation);
+        conn = be.openConnection();
 
     }
 
@@ -70,6 +65,7 @@ public class LogicEngine {
                             numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
                         } catch (Exception e) {
                             failureFormat(output, commands, commands.length, index);
+                            _failure = true;
                         }
                     } else {
                         failureFormat(output, commands, commands.length, index);

@@ -53,12 +53,14 @@ public class BackEnd {
                 String taskTable = getTaskTable(projectName);
                 String dropTable = "DROP TABLE IF EXISTS " + taskTable;
                 create.execute(dropTable);
+                conn.commit();
                 printAllTables(conn);
                 System.out.println(taskTable);
                 final String createTable = "CREATE TABLE " + taskTable +
                         "(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
                 create.execute(createTable);
+                conn.commit();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +74,7 @@ public class BackEnd {
         try {
             Statement create = conn.createStatement();
             ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
-
+            conn.commit();
             while (resultSet.next()) {
                 projects.addLast(resultSet.getString("NAME"));
             }
@@ -102,6 +104,7 @@ public class BackEnd {
             String query = "UPDATE " + getTaskTable(project) + " SET STATUS = " + status + " WHERE NAME = '" + task + "'";
             Statement create = conn.createStatement();
             create.executeUpdate(query);
+            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -112,6 +115,7 @@ public class BackEnd {
             String query = "UPDATE " + getTaskTable(project) + " SET OWNER = '" + user + "' WHERE NAME = '" + task + "'";
             Statement create = conn.createStatement();
             create.executeUpdate(query);
+            conn.commit();
         } catch (SQLException e) {
 //            e.printStackTrace();
             return false;
@@ -125,6 +129,7 @@ public class BackEnd {
         try {
             Statement state = conn.createStatement();
             state.executeUpdate(addTask);
+            conn.commit();
         } catch (SQLException e) {
 //            e.printStackTrace();
             return false;
@@ -148,6 +153,7 @@ public class BackEnd {
                 }
                 tasks.addLast(task);
             }
+            conn.commit();
         } catch (SQLException e) {
 //            e.printStackTrace();
             tasks = new LinkedList<>();
@@ -167,6 +173,7 @@ public class BackEnd {
             String query = "SELECT * FROM " + PROJECTS + " WHERE NAME = '" + project + "'";
             Statement state = conn.createStatement();
             ResultSet resultSet = state.executeQuery(query);
+            conn.commit();
             resultSet.next();
             return resultSet.getInt("TASKS");
         } catch (SQLException e) {
@@ -186,7 +193,7 @@ public class BackEnd {
 
     public Connection openConnection() throws SQLException {
         Connection c = DriverManager.getConnection("jdbc:sqlite:" + _dbFile);
-        c.setAutoCommit(true);
+        c.setAutoCommit(false);
         return c;
     }
 

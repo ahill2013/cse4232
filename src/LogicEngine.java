@@ -31,16 +31,22 @@ import java.util.LinkedList;
 public class LogicEngine {
     BackEnd be;
     private Connection conn;
-    private File dbFile;
+    private String dbFile;
 
     public LogicEngine(String dbLocation) throws SQLException {
-
-        be = new BackEnd(dbLocation);
-        conn = be.openConnection();
+        dbFile = dbLocation;
 
     }
 
-    public String parseInput(String input, String IP, int port) {
+    public String parseInput(String input, String IP, int port) throws SQLException {
+        try {
+            be = new BackEnd(dbFile);
+            conn = be.openConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
         StringBuilder output = new StringBuilder();
         String[] commands = input.split(";");
 
@@ -203,6 +209,7 @@ public class LogicEngine {
             }
         }
         output.append("\n");
+        be.closeConnection(conn);
         return output.toString();
     }
 

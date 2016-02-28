@@ -1,0 +1,33 @@
+How to test: use netcat to open connection to 127.0.0.1 2132
+In intellij specify a debug application with arguments -p 2132 -d "/path/to/desired/db/location"
+
+One problem that has to be fixed is that if you pass /temp.db as argument it crashes because it doesn't know where this is or it doesn't have permission to write to the location. I catch that now, but...
+
+
+PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;
+
+PROJECT_DEFINITION:Exam1;TASKS:0;Buy paper;
+
+GET_PROJECT:Exam1
+
+TAKE;USER:Johny;PROJECT:Exam;Buy paper
+
+TAKE;USER:Johny;PROJECT:Exam;Write exam
+
+GET_PROJECTS
+
+GET_PROJECT;Exam
+
+
+Try copy and pasting this in multiple times. First time fine. Second time database locks.
+//****************
+PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;PROJECT_DEFINITION:Exam1;TASKS:0;TAKE;USER:Johny;PROJECT:Exam;Buy paper;TAKE;USER:Johny;PROJECT:Exam;Write exam;GET_PROJECTS;GET_PROJECT;Exam;GET_PROJECT;Exam1;
+************////
+
+PROJECT_DEFINITION:Exam2;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z;
+
+TAKE;USER:Johny;PROJECT:Exam2;Buy paper
+
+TAKE;USER:Johny;PROJECT:Exam2;Write exam
+
+GET_PROJECT;Exam2;

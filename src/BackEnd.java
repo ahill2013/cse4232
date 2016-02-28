@@ -49,21 +49,19 @@ public class BackEnd {
             String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "','" + tasks + "')";
             Statement create = conn.createStatement();
             create.executeUpdate(addProjectName);
-            conn.commit();
             if (tasks > 0) {
-                final String taskTable = getTaskTable(projectName);
-                final String dropTable = "DROP TABLE IF EXISTS " + taskTable;
+                String taskTable = getTaskTable(projectName);
+                String dropTable = "DROP TABLE IF EXISTS " + taskTable;
                 create.execute(dropTable);
-                conn.commit();
-
+                printAllTables(conn);
+                System.out.println(taskTable);
                 final String createTable = "CREATE TABLE " + taskTable +
                         "(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
                 create.execute(createTable);
-                conn.commit();
             }
         } catch (SQLException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -164,24 +162,31 @@ public class BackEnd {
         return projectName + "_tasks";
     }
 
-
+    public int getNumberTasks(Connection conn, String project) {
+        try {
+            String query = "SELECT * FROM " + PROJECTS + " WHERE NAME = '" + project + "'";
+            Statement state = conn.createStatement();
+            ResultSet resultSet = state.executeQuery(query);
+            resultSet.next();
+            return resultSet.getInt("TASKS");
+        } catch (SQLException e) {
+            return -1;
+        }
+    }
 
     private void openDatabase(String dbFile) throws SQLException {
         Connection conn = null;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
 
         conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
-        conn.setAutoCommit(false);
-
         Statement state = conn.createStatement();
         state.execute(pub);
-        conn.commit();
         conn.close();
     }
 
     public Connection openConnection() throws SQLException {
         Connection c = DriverManager.getConnection("jdbc:sqlite:" + _dbFile);
-        c.setAutoCommit(false);
+        c.setAutoCommit(true);
         return c;
     }
 

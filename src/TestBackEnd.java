@@ -44,6 +44,10 @@ public class TestBackEnd {
         be.setUser(conn, project, write, "Mary");
         be.setStatus(conn, project, buy, 1);
 
+        System.out.println(be.getNumberTasks(conn, project));
+        System.out.println(be.getNumberTasks(conn, "Exam1"));
+
+
         LinkedList<String> projects = be.getAllProjects(conn);
         for (String proj : projects) {
             System.out.println(proj);

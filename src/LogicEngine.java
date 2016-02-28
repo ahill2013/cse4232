@@ -105,9 +105,6 @@ public class LogicEngine {
                     index = tasksIndex;
                     break;
                 case "TAKE":
-                    String userArg = commands[index + 1].split(":")[1];
-                    String projectArg = commands[index + 2].split(":")[1];
-                    String task = commands[index + 3];
 
                     if ((index + 3) > commands.length) {
                         appendOutput(output, "Fail");
@@ -115,15 +112,19 @@ public class LogicEngine {
                             appendOutput(output, commands[index]);
                         }
                         _failure = true;
-                    }
-
-                    if (be.setUser(conn, projectArg, task, userArg)) {
-                        appendOutput(output, "OK");
-                        appendOutput(output, commands[index + 1]);
-                        appendOutput(output, commands[index + 2]);
-                        appendOutput(output, commands[index + 3]);
                     } else {
-                        failureFormat(output, commands, commands.length, index);
+                        String userArg = commands[index + 1].split(":")[1];
+                        String projectArg = commands[index + 2].split(":")[1];
+                        String task = commands[index + 3];
+                        if (be.setUser(conn, projectArg, task, userArg)) {
+                            appendOutput(output, "OK");
+                            appendOutput(output, commands[index + 1]);
+                            appendOutput(output, commands[index + 2]);
+                            appendOutput(output, commands[index + 3]);
+                        } else {
+                            failureFormat(output, commands, commands.length, index);
+                            _failure = true;
+                        }
                     }
 
                     index += 4;
@@ -144,21 +145,25 @@ public class LogicEngine {
                     index += 1;
                     break;
                 case "GET_PROJECT":
-                    if ((index + 1) > commands.length) {
+                    if (!((index + 1) < commands.length)) {
                         appendOutput(output, "Fail");
                         appendOutput(output, commands[index]);
                         _failure = true;
                     } else {
                         String project = commands[index + 1];
                         LinkedList<String[]> tasks = be.getTasks(conn,project);
-                        if (tasks.peek()[0].equals("Failure")) {
+                        if (be.getNumberTasks(conn, project) == 0) {
+                            appendOutput(output, "OK");
+                            appendOutput(output, "PROJECT_DEFINITION:" + project);
+                            index += 2;
+                        } else if (tasks.peek()[0].equals("Failure")) {
                             failureFormat(output, commands, commands.length, index);
                             _failure = true;
                         } else {
                             if (checkStatus(project, tasks)) {
                                 tasks = be.getTasks(conn, project);
                                 appendOutput(output, "OK");
-                                appendOutput(output, "PROJECT_DEFINITION:" + commands[index + 1]);
+                                appendOutput(output, "PROJECT_DEFINITION:" + project);
                                 appendOutput(output, "TASKS:" + tasks.size());
 
                                 for (String[] part : tasks) {
@@ -184,11 +189,11 @@ public class LogicEngine {
                                         appendOutput(output, "Done");
                                     }
                                 }
+                                index+=2;
                             } else {
                                 failureFormat(output, commands, commands.length, index);
                                 _failure = true;
                             }
-                            index += 2;
                         }
                     }
                     break;

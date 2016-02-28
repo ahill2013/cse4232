@@ -69,16 +69,18 @@ public class Handler {
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-                String line = reader.readLine();
-                if (line==null) {
-                    break;
-                }
-                System.out.println(line);
-                String output = engine.parseInput(line, IP, clientPort);
-                System.out.println(output);
-                writer.write(output);
-                writer.flush();
 
+                for (;;) {
+                    String line = reader.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    System.out.println(line);
+                    String output = engine.parseInput(line, IP, clientPort);
+                    System.out.println(output);
+                    writer.write(output);
+                    writer.flush();
+                }
                 sock.close();
 
             }

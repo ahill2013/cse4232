@@ -170,21 +170,21 @@ public class LogicEngine {
                                     if (part[3] == null) {
                                         part[3] = "";
                                     }
-                                    if (Integer.parseInt(part[6]) == 0) {
+                                    if (Integer.parseInt(part[4]) == 0) {
                                         appendOutput(output, part[0]); // Name
                                         appendOutput(output, part[1]); // Start
                                         appendOutput(output, part[2]); // End
                                         appendOutput(output, part[3]); // Owner
-                                        appendOutput(output, part[4]); // IP
-                                        appendOutput(output, part[5]); // Port
+                                        appendOutput(output, part[5]); // IP
+                                        appendOutput(output, part[6]); // Port
                                         appendOutput(output, "Waiting"); // Status
                                     } else {
                                         appendOutput(output, part[0]);
                                         // Start is not output if task is complete
                                         appendOutput(output, part[2]);
                                         appendOutput(output, part[3]);
-                                        appendOutput(output, part[4]);
                                         appendOutput(output, part[5]);
+                                        appendOutput(output, part[6]);
                                         appendOutput(output, "Done");
                                     }
                                 }
@@ -221,7 +221,7 @@ public class LogicEngine {
 
     private boolean checkStatus(String project, LinkedList<String[]> tasks) {
         for (String[] part : tasks) {
-            if (Integer.parseInt(part[6]) == 0) {
+            if (Integer.parseInt(part[4]) == 0) {
                 int done = isDone(part[2]);
                 if (done == 1) {
                     be.setStatus(conn, project, part[0], done);
@@ -235,10 +235,13 @@ public class LogicEngine {
 
     private int isDone(String end) {
         try {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss.SSS'Z'");
-            Date endTime = dateFormat.parse(end);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
+            String update = end.replace('m', '-');
+            update = update.replace('s', '-');
+            update = update.replace('h', '-');
+            Date endTime = dateFormat.parse(update);
             Date current = new Date();
-            return endTime.compareTo(current);
+            return current.compareTo(endTime);
         } catch (Exception e) {
             e.printStackTrace();
             return Integer.MAX_VALUE;

@@ -59,9 +59,11 @@ public class Handler {
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
+            System.exit(-1);
         } catch (FileNotFoundException e) {
             System.err.println("File not found");
             e.printStackTrace();
+            System.exit(-1);
         }
 
 

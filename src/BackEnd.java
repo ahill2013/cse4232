@@ -165,7 +165,7 @@ public class BackEnd {
     }
 
     private String getTaskTable(String projectName) {
-        return projectName + "_tasks";
+        return projectName.replaceAll("[ */&?;]", "__") + "_tasks";
     }
 
     public int getNumberTasks(Connection conn, String project) {

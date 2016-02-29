@@ -26,6 +26,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.ServerSocket;
 
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -44,11 +45,17 @@ public class Handler {
     }
     public static void main(final String [] args) {
 
+        // TODO: Move this check to the run.sh file
         if (args.length < 1) {
             System.err.println("Usage: run.sh <port number>");
             System.exit(1);
         }
 
+        // Attempting to find correct path. This should get the directory
+        // from which the program and JVM was started.
+        // NOTE:  This should not be the "Current working directory"
+        String currentRelativePath = Paths.get("").toAbsolutePath().toString();
+        System.out.println(currentRelativePath + "\n");
 
         Parser parseArgs = new Parser(setArgs());
         LogicEngine engine;
@@ -62,10 +69,14 @@ public class Handler {
 
             ServerSocket server = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
 
+            System.out.println("Waiting for connection from client...\n");
+
             for(;;) {
                 Socket sock = server.accept();
-                String IP = sock.getInetAddress().toString();
+                String IP = sock.getInetAddress().toString().substring(sock.getInetAddress().toString().indexOf('/') + 1);
                 int clientPort = sock.getPort();
+
+                System.out.println("Connected: " + IP);
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
@@ -106,31 +117,6 @@ public class Handler {
             System.exit(-1);
         }
 
-        /*try {
-            cmd = parseArgs.getCMD(args);
-            engine = new LogicEngine(cmd.);
-            port = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
-
-            client = port.accept();
-            reader = new BufferedReader(new InputStreamReader(client.getInputStream(), "UTF-8"));
-            writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream(), "UTF-8"));
-
-            while (true) {
-
-                String[] input = reader.readLine().split(";");
-                String output = engine.response(input);
-            }
-
-        } catch (ParseException e) {
-            System.out.println("Illegal argument format");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("Illegal port number");
-            e.printStackTrace();
-        } */
-
-
     }
-
 
 }

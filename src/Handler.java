@@ -70,6 +70,10 @@ public class Handler {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 
+                // Greet User upon connection to server
+                writer.write("Hello User! You may now enter a command.\n\n");
+                writer.flush();
+
                 for (;;) {
                     String line = reader.readLine();
                     if (line == null) {
@@ -78,7 +82,9 @@ public class Handler {
                     System.out.println(line);
                     String output = engine.parseInput(line, IP, clientPort);
                     System.out.println(output);
+                    writer.write("\n");
                     writer.write(output);
+                    writer.write("\n");
                     writer.flush();
                 }
                 sock.close();

@@ -13,6 +13,7 @@ public class TestBackEnd {
         Connection conn = null;
         try {
             be = new BackEnd("/home/armin1215/Networks/test.db");
+            //be = new BackEnd("/home/adam/Documents/NP/Milestone 2/server/cse4232/test.db");
             conn = be.openConnection();
         } catch (SQLException e) {
             e.printStackTrace();

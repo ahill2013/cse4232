@@ -13,6 +13,7 @@ public class TestLogicEngine {
 
         try {
             LogicEngine engine = new LogicEngine("/home/armin1215/Networks/test.db");
+            //LogicEngine engine = new LogicEngine("/home/adam/Documents/NP/Milestone 2/server/cse4232/test.db");
 
             String projectCreation = engine.parseInput("PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2016-03-15:18h30m00s001Z;" +
                     "Write exam;2016-03-15:18h30m00s001Z;2016-03-15:18h30m00s001Z;TAKE;USER:Johny;PROJECT:Exam;Buy paper" +

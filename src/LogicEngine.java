@@ -36,12 +36,28 @@ public class LogicEngine {
     private Connection conn;
     private String dbFile;
 
+    /**
+     * Checks whether proposed database location exists and if a database does not
+     * already exist with the given name then creates a database
+     * @param dbLocation proposed location
+     * @throws SQLException if creating/opening database fails
+     */
     public LogicEngine(String dbLocation) throws SQLException {
         dbFile = dbLocation;
-
+        be = new BackEnd(dbFile);
     }
 
+    /**
+     * Given input execute all commands
+     * @param input string of commands (as many as won't break the JVM)
+     * @param IP IP of origin for the commands
+     * @param port which port they were sent from on client's computer
+     * @return output response to parsing and executing commands
+     * @throws SQLException if connection fails to close
+     */
     public String parseInput(String input, String IP, int port) throws SQLException {
+
+        // Open connection. If connection fails then kill the program. Any errors here are unforeseen
         try {
             be = new BackEnd(dbFile);
             conn = be.openConnection();
@@ -50,17 +66,22 @@ public class LogicEngine {
             System.exit(-1);
         }
 
+        // Initialize commands structure and output string
         StringBuilder output = new StringBuilder();
         String[] commands = input.split(";");
 
-
+        // if failure becomes true then loop ends and all input after index is printed
+        // Loop until all commands in string are parsed
         boolean _failure = false;
         int index = 0;
         while (index < commands.length && !_failure) {
+            // Given first command try to match it and if so execute it.
             String[] commandArg = commands[index].split(":");
             switch (commandArg[0]) {
                 case "PROJECT_DEFINITION":
                     String name = null;
+
+                    // Is there a name for the project?
                     try {
                         name = commandArg[1];
                     } catch (IndexOutOfBoundsException e) {
@@ -68,20 +89,23 @@ public class LogicEngine {
                         _failure = true;
                         break;
                     }
-                    // Get the number of tasks
+
                     int commandIndex = index;
                     int numIndex = index + 1;
                     int tasksIndex = index + 2;
                     int numTasks = 0;
 
-                    // If there is a project definition and nothing after it
+                    // If there is a project definition and nothing after it then go to else and break
                     if (numIndex < commands.length) {
                         String[] nums = commands[numIndex].split(":");
+                        // If the name for the next command is wrong break
                         if (!nums[0].equals("TASKS") || !(nums.length == 2)) {
                             failureFormat(output, commands, commands.length, index);
                             _failure = true;
                             break;
                         }
+
+                        // If the number of tasks is not a valid number break
                         try {
                             numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
                         } catch (Exception e) {
@@ -95,6 +119,7 @@ public class LogicEngine {
                         break;
                     }
 
+                    // If there aren't enough names and times for the number of tasks break
                     if ((tasksIndex + 3*numTasks) > commands.length) {
                         failureFormat(output, commands, commands.length, index);
                         _failure = true;
@@ -105,40 +130,41 @@ public class LogicEngine {
                     boolean projectCreated = be.createProject(conn, commandArg[1], numTasks);
                     boolean taskCreated = true;
 
+                    // If project is successfully created add tasks
                     if (projectCreated) {
 
                         for (int i = 0; i < numTasks; i++) {
                             taskCreated = be.insertTask(conn, name, commands[tasksIndex], commands[tasksIndex + 1], commands[tasksIndex + 2], IP, port);
                             tasksIndex += 3;
                             if (!taskCreated) {
-                                _failure = true;
                                 break;
                             }
                         }
                     }
 
+                    // If project and task creation is successful print output else fail and break
                     if (projectCreated && taskCreated) {
                         appendOutput(output, "OK");
                         projectOutput(output, commands, index, tasksIndex);
                     } else {
                         failureFormat(output, commands, commands.length, index);
                         _failure = true;
+                        break; // Not strictly necessary but makes more sense here
                     }
 
                     index = tasksIndex;
                     break;
                 case "TAKE":
-
+                    // If there aren't enough strings to fill commands
                     if ((index + 3) > commands.length) {
-                        appendOutput(output, "Fail");
-                        for (int i = index; i < commands.length; i++) {
-                            appendOutput(output, commands[index]);
-                        }
+                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
+                        break;
                     } else {
                         String[] user = commands[index + 1].split(":");
                         String[] project = commands[index + 2].split(":");
 
+                        // If format of strings is not correct output failure and break
                         if (user.length != 2 || project.length !=2 ||
                                 !user[0].equals("USER") || !project[0].equals("PROJECT")) {
                             failureFormat(output, commands, commands.length, index);
@@ -149,6 +175,7 @@ public class LogicEngine {
                         String userArg = user[1];
                         String projectArg = project[1];
                         String task = commands[index + 3];
+                        // If user is set execute output otherwise fail and break
                         if (be.setUser(conn, projectArg, task, userArg)) {
                             appendOutput(output, "OK");
                             appendOutput(output, commands[index + 1]);
@@ -164,6 +191,7 @@ public class LogicEngine {
                     index += 4;
                     break;
                 case "GET_PROJECTS":
+                    // Get all projects and append to output unless database is locked or does not exist. If locked print failure
                     try {
                         LinkedList<String> projects = be.getAllProjects(conn);
                         appendOutput(output, "OK");
@@ -181,13 +209,16 @@ public class LogicEngine {
                     }
                     break;
                 case "GET_PROJECT":
+                    // If there is not project name, break
                     if (!((index + 1) < commands.length)) {
-                        appendOutput(output, "Fail");
-                        appendOutput(output, commands[index]);
+                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                     } else {
                         String project = commands[index + 1];
 
+                        // Get the number of tasks for the project. If zero then just print out project.
+                        // If less than one then the project does not exist or there is a database problem.
+                        // Otherwise execute retrieval
                         int numberTasks = be.getNumberTasks(conn, project);
                         if (numberTasks == 0) {
                             appendOutput(output, "OK");
@@ -198,14 +229,17 @@ public class LogicEngine {
                             _failure = true;
                         } else {
                             LinkedList<String[]> tasks = be.getTasks(conn,project);
+                            // Check whether all projects are done or waiting and whether their status needs
+                            // to be changed
                             if (checkStatus(project, tasks)) {
                                 tasks = be.getTasks(conn, project);
                                 appendOutput(output, "OK");
                                 appendOutput(output, "PROJECT_DEFINITION:" + project);
                                 appendOutput(output, "TASKS:" + tasks.size());
-
+                                // For each task output all of the information on the task. Either was set of output
+                                // if waiting and another if done.
                                 for (String[] part : tasks) {
-
+                                    // Prevent error if owner has not been set
                                     if (part[3] == null) {
                                         part[3] = "";
                                     }
@@ -218,13 +252,13 @@ public class LogicEngine {
                                         appendOutput(output, part[6]); // Port
                                         appendOutput(output, "Waiting"); // Status
                                     } else {
-                                        appendOutput(output, part[0]);
+                                        appendOutput(output, part[0]); //Name
                                         // Start is not output if task is complete
-                                        appendOutput(output, part[2]);
-                                        appendOutput(output, part[3]);
-                                        appendOutput(output, part[5]);
-                                        appendOutput(output, part[6]);
-                                        appendOutput(output, "Done");
+                                        appendOutput(output, part[2]); // End
+                                        appendOutput(output, part[3]); // Owner
+                                        appendOutput(output, part[5]); // IP
+                                        appendOutput(output, part[6]); // Port
+                                        appendOutput(output, "Done");  // Status
                                     }
                                 }
                                 index+=2;
@@ -233,6 +267,7 @@ public class LogicEngine {
                     }
                     break;
                 default:
+                    // If not a recognizable command output failure
                     failureFormat(output, commands, commands.length, index);
                     _failure = true;
             }
@@ -242,20 +277,41 @@ public class LogicEngine {
         return output.toString();
     }
 
-    //Do not use for anyone else
+    /**
+     * Specifically for the case when project output is created successfully
+     * @param output string builder
+     * @param commands list of commands
+     * @param index index to begin from
+     * @param tasksIndex the index of the end of the tasks
+     */
     private void projectOutput(StringBuilder output, String[] commands, int index, int tasksIndex) {
         for (int i = index; i < tasksIndex; i++) {
             appendOutput(output, commands[i]);
         }
     }
 
-    private void failureFormat(StringBuilder output, String[] commands, int commandsLength, int index) {
+    /**
+     * For whenever a failure occurs in parsing data. Prints fail for all remaining commands after encountering
+     * a bad command in input
+     * @param output string builder
+     * @param commands list of commands
+     * @param commandsLength total number of commands
+     * @param index index to begin failure formatting from
+     */
+    private static void failureFormat(StringBuilder output, String[] commands, int commandsLength, int index) {
         appendOutput(output, "Fail");
         for (int i = index; i < commandsLength; i++) {
             appendOutput(output, commands[i]);
         }
     }
 
+    /**
+     * Given a project, determine whether the status of all of its tasks are appropriate. If not change the
+     * status to reflect the tasks state
+     * @param project project name
+     * @param tasks the number of tasks to read
+     * @return whether all of the status's were successfully checked. Will return false if a table is locked or corrupted
+     */
     private boolean checkStatus(String project, LinkedList<String[]> tasks) {
         for (String[] part : tasks) {
             if (Integer.parseInt(part[4]) == 0) {
@@ -270,6 +326,11 @@ public class LogicEngine {
         return true;
     }
 
+    /**
+     * Checks whether a task is past its completion point
+     * @param end string representing the time of completion
+     * @return compareTo() output after string has been formatted for simple date format
+     */
     private int isDone(String end) {
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
@@ -285,6 +346,9 @@ public class LogicEngine {
         }
     }
 
+    /**
+     * Close the connection to the database
+     */
     public void closeLogicEngine() {
         try {
             be.closeConnection(conn);
@@ -294,6 +358,11 @@ public class LogicEngine {
         }
     }
 
+    /**
+     * Append to an output string another token
+     * @param output
+     * @param append
+     */
     public static void appendOutput(StringBuilder output, String append) {
         if (output.length() > 0) {
             output.append(";");
@@ -301,6 +370,9 @@ public class LogicEngine {
         output.append(append);
     }
 
+    /**
+     * For debugging specifically
+     */
     public void printDatabase() {
         be.printAllProjects(conn);
         be.printAllTables(conn);

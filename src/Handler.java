@@ -23,6 +23,7 @@ import org.apache.commons.cli.*;
 
 import java.io.*;
 
+import java.net.BindException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
@@ -45,24 +46,28 @@ public class Handler {
     }
     public static void main(final String [] args) {
 
-        // TODO: Move this check to the run.sh file
-        if (args.length < 1) {
-            System.err.println("Usage: run.sh <port number>");
-            System.exit(1);
-        }
-
         // Attempting to find correct path. This should get the directory
         // from which the program and JVM was started.
         // NOTE:  This should not be the "Current working directory"
         String currentRelativePath = Paths.get("").toAbsolutePath().toString();
         System.out.println(currentRelativePath + "\n");
 
+        String[] newArgs = new String[4];
+        if (args.length == 1) {
+            newArgs[0] = "-p";
+            newArgs[1] = args[0];
+            newArgs[2] = "-d";
+            newArgs[3] = currentRelativePath + "/temp.db";
+        } else
+            for (int i=0; i<4; i++)
+                newArgs[i] = args[i];
+
         Parser parseArgs = new Parser(setArgs());
         LogicEngine engine;
         CommandLine cmd;
 
         try {
-            cmd = parseArgs.getCMD(args);
+            cmd = parseArgs.getCMD(newArgs);
             //TODO:Make sure that any file works with the engine
             //TODO:If given abbreviated file name, get full file path
             engine = new LogicEngine(cmd.getOptionValue("d"));
@@ -105,6 +110,8 @@ public class Handler {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
             System.exit(-1);
+        } catch (BindException e) {
+            System.err.println("Port already in use. Specify a different port.");
         } catch (FileNotFoundException e) {
             System.err.println("File not found");
             e.printStackTrace();
@@ -112,7 +119,7 @@ public class Handler {
         } catch (IOException e) {
             System.out.println("Problem connecting to socket");
             e.printStackTrace();
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
             System.err.println("Could not access database. Does the program have write rights to the directory?");
             System.exit(-1);
         }

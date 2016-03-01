@@ -29,10 +29,6 @@ public class Parser {
     private Options opts;
     private CommandLineParser parser;
 
-
-//    final String[] arg1 = {"p", "true", "specify port number"};
- //   final String[] arg2 = {"d", "true", "specify database location"};
-
     public Parser(LinkedList<String[]> options) throws IllegalArgumentException {
         opts = new Options();
         for (String[] opt: options) {
@@ -73,7 +69,5 @@ public class Parser {
     public static CommandLineParser getDefaultParser() {
         return new DefaultParser();
     }
-
-
 
 }

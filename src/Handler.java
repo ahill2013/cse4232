@@ -101,9 +101,9 @@ public class Handler {
                     if (line == null) {
                         break;
                     }
-                    System.out.println(line);
+                    //System.out.println(line);
                     String output = engine.parseInput(line, IP, clientPort);
-                    System.out.println(output);
+                    //System.out.println(output);
                     writer.write("\n");
                     writer.write(output);
                     writer.write("\n");

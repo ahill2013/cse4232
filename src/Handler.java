@@ -33,32 +33,35 @@ import java.util.LinkedList;
 
 
 public class Handler {
+
     private static LinkedList<String[]> setArgs() {
+
         LinkedList<String[]> arguments = new LinkedList<>();
-
-
         final String[] arg1 = {"p", "true", "specify port number"};
         final String[] arg2 = {"d", "true", "specify database location"};
         arguments.addLast(arg1);
         arguments.addLast(arg2);
-        return arguments;
 
+        return arguments;
     }
+
     public static void main(final String [] args) {
 
         // Attempting to find correct path. This should get the directory
         // from which the program and JVM was started.
         // NOTE:  This should not be the "Current working directory"
         String currentRelativePath = Paths.get("").toAbsolutePath().toString();
-        System.out.println(currentRelativePath + "\n");
 
+        // This is here in case ony one argument is passed to run.sh.  For example: run.sh 2132
+        // It will add -p and -d to the "command line args," and a default path for the SQLite db file
+        // since one was not provided when the program was started.
         String[] newArgs = new String[4];
         if (args.length == 1) {
             newArgs[0] = "-p";
             newArgs[1] = args[0];
             newArgs[2] = "-d";
             newArgs[3] = currentRelativePath + "/temp.db";
-        } else
+        } else // If there is more than one arg, use the command-line args as normal
             for (int i=0; i<4; i++)
                 newArgs[i] = args[i];
 
@@ -77,9 +80,12 @@ public class Handler {
             System.out.println("Waiting for connection from client...\n");
 
             for(;;) {
-                Socket sock = server.accept();
+                Socket sock = server.accept();   // accept connection
+                // Get the IP address the client connected from.
+                // We use substring() because toString() returns "HOSTNAME/physicalIP".
+                // We have no use for the hostname in our case, so we take the physical IP address only
                 String IP = sock.getInetAddress().toString().substring(sock.getInetAddress().toString().indexOf('/') + 1);
-                int clientPort = sock.getPort();
+                int clientPort = sock.getPort(); // get the port the client is connected to
 
                 System.out.println("Connected: " + IP);
 

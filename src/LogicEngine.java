@@ -66,6 +66,9 @@ public class LogicEngine {
             System.exit(-1);
         }
 
+        if (input.equals(""))
+            return input;
+
         // Initialize commands structure and output string
         StringBuilder output = new StringBuilder();
         String[] commands = input.split(";");

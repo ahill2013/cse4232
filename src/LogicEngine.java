@@ -95,6 +95,7 @@ public class LogicEngine {
                             taskCreated = be.insertTask(conn, name, commands[tasksIndex], commands[tasksIndex + 1], commands[tasksIndex + 2], IP, port);
                             tasksIndex += 3;
                             if (!taskCreated) {
+                                _failure = true;
                                 break;
                             }
                         }

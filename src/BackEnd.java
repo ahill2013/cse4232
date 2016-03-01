@@ -32,7 +32,10 @@
  * closeConnection end a connection
  ****************************************************************/
 import java.sql.*;
-import java.util.LinkedList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
 
 public class BackEnd {
 
@@ -85,8 +88,8 @@ public class BackEnd {
                         "'(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
                 create.execute(createTable);
-                conn.commit();
             }
+            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -100,18 +103,14 @@ public class BackEnd {
      * @return string of names. Returns "Failure" as first and only string in list if it fails to read from the database
      * This is weird but also suprisingly useful.
      */
-    LinkedList<String> getAllProjects(Connection conn) {
+    LinkedList<String> getAllProjects(Connection conn) throws SQLException {
         LinkedList<String> projects = new LinkedList<>();
-        try {
-            Statement create = conn.createStatement();
-            ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
-            conn.commit();
-            while (resultSet.next()) {
-                projects.addLast(resultSet.getString("NAME"));
-            }
-        } catch (SQLException e) {
-            projects = new LinkedList<>();
-            projects.add("Failure");
+        Statement create = conn.createStatement();
+        ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
+        conn.commit();
+
+        while (resultSet.next()) {
+            projects.addLast(resultSet.getString("NAME"));
         }
 
         return projects;
@@ -189,13 +188,17 @@ public class BackEnd {
      * @return whether task was added successfully
      */
     public boolean insertTask(Connection conn, String projectName, String task, String start, String end, String IP, int port) {
+        if (!isValidDate(start) || !isValidDate(end)) {
+            return false;
+        }
+
         String addTask = "INSERT OR REPLACE INTO '" + getTaskTable(projectName) + "'(NAME, START, END, STATUS, IP, PORT) VALUES('" +
                 task + "','" + start + "','" + end + "','" + 0 + "','" + IP + "','" + port + "')";
         try {
             Statement state = conn.createStatement();
             state.executeUpdate(addTask);
             conn.commit();
-        } catch (SQLException e) {
+        } catch (Exception e) {
 //            e.printStackTrace();
             return false;
         }
@@ -226,11 +229,7 @@ public class BackEnd {
             }
             conn.commit();
         } catch (SQLException e) {
-//            e.printStackTrace();
-            tasks = new LinkedList<>();
-            String[] f = new String[1];
-            f[0] = "Failure";
-            tasks.addFirst(f);
+            e.printStackTrace();
         }
         return tasks;
     }
@@ -245,19 +244,47 @@ public class BackEnd {
         return projectName + "_tasks";
     }
 
+    /**
+     * Get the number of tasks associated with a project
+     * @param conn already open connection to sqlite database
+     * @param project project name
+     * @return number of tasks for project
+     */
     public int getNumberTasks(Connection conn, String project) {
+        int tasks;
         try {
             String query = "SELECT * FROM " + PROJECTS + " WHERE NAME = '" + project + "'";
             Statement state = conn.createStatement();
             ResultSet resultSet = state.executeQuery(query);
-            conn.commit();
             resultSet.next();
-            return resultSet.getInt("TASKS");
+            tasks = resultSet.getInt(1);
+            conn.commit();
         } catch (SQLException e) {
             return -1;
         }
+        return tasks;
     }
 
+    public int getNumberProjects(Connection conn) {
+        int projects;
+        try {
+            String query = "SELECT Count(*) FROM " + PROJECTS;
+            Statement state = conn.createStatement();
+            ResultSet resultSet = state.executeQuery(query);
+            conn.commit();
+            resultSet.next();
+            projects = resultSet.getInt(1);
+        } catch (SQLException e) {
+            return -1;
+        }
+        return projects;
+    }
+
+    /**
+     * Run on startup to make sure that database is accessible and has a projects table
+     * @param dbFile proposed location for database
+     * @throws SQLException if the database location is not accessible or writable
+     */
     private void openDatabase(String dbFile) throws SQLException {
         Connection conn = null;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
@@ -268,12 +295,22 @@ public class BackEnd {
         conn.close();
     }
 
+    /**
+     * Opens connection to sqlite database with the location given the constructor
+     * @return an open sqlite connection to the database
+     * @throws SQLException if the database is locked or there are concurrency issues
+     */
     public Connection openConnection() throws SQLException {
         Connection c = DriverManager.getConnection("jdbc:sqlite:" + _dbFile);
         c.setAutoCommit(false);
         return c;
     }
 
+    /**
+     * Close a connection to the database
+     * @param c already open connection to database
+     * @throws SQLException if the connection cannot be closed
+     */
     public void closeConnection(Connection c) throws SQLException {
         c.close();
     }
@@ -392,4 +429,16 @@ public class BackEnd {
         return retrievedTask;
     }
 
+    public boolean isValidDate(String date) {
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
+            String update =date.replace('m', '-');
+            update = update.replace('s', '-');
+            update = update.replace('h', '-');
+            Date endTime = dateFormat.parse(update);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -49,17 +49,21 @@ public class TestBackEnd {
         System.out.println(be.getNumberTasks(conn, "Exam1"));
 
 
-        LinkedList<String> projects = be.getAllProjects(conn);
-        for (String proj : projects) {
-            System.out.println(proj);
-        }
-
-        LinkedList<String[]> tasks = be.getTasks(conn, project);
-        for (String[] task : tasks) {
-            for (String part : task) {
-                System.out.print(part + " ");
+        try {
+            LinkedList<String> projects = be.getAllProjects(conn);
+            for (String proj : projects) {
+                System.out.println(proj);
             }
-            System.out.println();
+
+            LinkedList<String[]> tasks = be.getTasks(conn, project);
+            for (String[] task : tasks) {
+                for (String part : task) {
+                    System.out.print(part + " ");
+                }
+                System.out.println();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         try {

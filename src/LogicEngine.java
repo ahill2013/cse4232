@@ -28,6 +28,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
+/**
+ * Parses single line of input from the user.
+ */
 public class LogicEngine {
     BackEnd be;
     private Connection conn;
@@ -57,8 +60,14 @@ public class LogicEngine {
             String[] commandArg = commands[index].split(":");
             switch (commandArg[0]) {
                 case "PROJECT_DEFINITION":
-
-                    String name = commandArg[1];
+                    String name = null;
+                    try {
+                        name = commandArg[1];
+                    } catch (IndexOutOfBoundsException e) {
+                        failureFormat(output, commands, commands.length, index);
+                        _failure = true;
+                        break;
+                    }
                     // Get the number of tasks
                     int commandIndex = index;
                     int numIndex = index + 1;
@@ -67,11 +76,18 @@ public class LogicEngine {
 
                     // If there is a project definition and nothing after it
                     if (numIndex < commands.length) {
+                        String[] nums = commands[numIndex].split(":");
+                        if (!nums[0].equals("TASKS") || !(nums.length == 2)) {
+                            failureFormat(output, commands, commands.length, index);
+                            _failure = true;
+                            break;
+                        }
                         try {
                             numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
                         } catch (Exception e) {
                             failureFormat(output, commands, commands.length, index);
                             _failure = true;
+                            break;
                         }
                     } else {
                         failureFormat(output, commands, commands.length, index);
@@ -120,8 +136,18 @@ public class LogicEngine {
                         }
                         _failure = true;
                     } else {
-                        String userArg = commands[index + 1].split(":")[1];
-                        String projectArg = commands[index + 2].split(":")[1];
+                        String[] user = commands[index + 1].split(":");
+                        String[] project = commands[index + 2].split(":");
+
+                        if (user.length != 2 || project.length !=2 ||
+                                !user[0].equals("USER") || !project[0].equals("PROJECT")) {
+                            failureFormat(output, commands, commands.length, index);
+                            _failure = true;
+                            break;
+                        }
+
+                        String userArg = user[1];
+                        String projectArg = project[1];
                         String task = commands[index + 3];
                         if (be.setUser(conn, projectArg, task, userArg)) {
                             appendOutput(output, "OK");
@@ -131,25 +157,28 @@ public class LogicEngine {
                         } else {
                             failureFormat(output, commands, commands.length, index);
                             _failure = true;
+                            break;
                         }
                     }
 
                     index += 4;
                     break;
                 case "GET_PROJECTS":
-                    LinkedList<String> projects = be.getAllProjects(conn);
-
-                    if (projects.peekFirst().equals("Failure")) {
-                        failureFormat(output, commands, commands.length, index);
-                        _failure = true;
-                    } else {
+                    try {
+                        LinkedList<String> projects = be.getAllProjects(conn);
                         appendOutput(output, "OK");
                         appendOutput(output, "PROJECTS:" + projects.size());
-                        for (String project : projects) {
-                            appendOutput(output, project);
+
+                        if (projects.size() != 0) {
+                            for (String project : projects) {
+                                appendOutput(output, project);
+                            }
                         }
+                        index += 1;
+                    } catch (SQLException e) {
+                        failureFormat(output, commands, commands.length, index);
+                        _failure = true;
                     }
-                    index += 1;
                     break;
                 case "GET_PROJECT":
                     if (!((index + 1) < commands.length)) {
@@ -158,15 +187,17 @@ public class LogicEngine {
                         _failure = true;
                     } else {
                         String project = commands[index + 1];
-                        LinkedList<String[]> tasks = be.getTasks(conn,project);
-                        if (be.getNumberTasks(conn, project) == 0) {
+
+                        int numberTasks = be.getNumberTasks(conn, project);
+                        if (numberTasks == 0) {
                             appendOutput(output, "OK");
                             appendOutput(output, "PROJECT_DEFINITION:" + project);
                             index += 2;
-                        } else if (tasks.peek()[0].equals("Failure")) {
+                        } else if (numberTasks < 0) {
                             failureFormat(output, commands, commands.length, index);
                             _failure = true;
                         } else {
+                            LinkedList<String[]> tasks = be.getTasks(conn,project);
                             if (checkStatus(project, tasks)) {
                                 tasks = be.getTasks(conn, project);
                                 appendOutput(output, "OK");
@@ -197,9 +228,6 @@ public class LogicEngine {
                                     }
                                 }
                                 index+=2;
-                            } else {
-                                failureFormat(output, commands, commands.length, index);
-                                _failure = true;
                             }
                         }
                     }

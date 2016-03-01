@@ -36,10 +36,10 @@ public class TestBackEnd {
         be.insertTask(conn, project, buy, start_buy, end_buy, IP, port);
         be.insertTask(conn, project, write, start_write, end_write, IP, port);
 
-        be.printAllProjects(conn);
-        be.printAllTables(conn);
-
-        be.printRowsInTable(conn, project, false);
+//        be.printAllProjects(conn);
+//        be.printAllTables(conn);
+//
+//        be.printRowsInTable(conn, project, false);
 
         be.setUser(conn, project, buy, "Johnny");
         be.setUser(conn, project, write, "Mary");

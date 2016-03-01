@@ -34,6 +34,10 @@ import java.util.LinkedList;
 
 public class Handler {
 
+    /**
+     * Returns the expected format to be input into CLI as the options used to bring the server online
+     * @return returns the arguments
+     */
     private static LinkedList<String[]> setArgs() {
 
         LinkedList<String[]> arguments = new LinkedList<>();
@@ -45,6 +49,10 @@ public class Handler {
         return arguments;
     }
 
+    /**
+     * Brings the server online and then begins reading and writing to clients.
+     * @param args command line arguments -p port# -d databasefile.db
+     */
     public static void main(final String [] args) {
 
         // Attempting to find correct path. This should get the directory

@@ -277,7 +277,9 @@ public class LogicEngine {
     }
 
     /**
-     * Specifically for the case when project output is created successfully
+     * When a project is created successfully append to the output string using this specific method.
+     * Made to handle the large number of tasks likely to be included
+     *
      * @param output string builder
      * @param commands list of commands
      * @param index index to begin from
@@ -291,7 +293,8 @@ public class LogicEngine {
 
     /**
      * For whenever a failure occurs in parsing data. Prints fail for all remaining commands after encountering
-     * a bad command in input
+     * a bad command in input. This outputs all remaining data from the input after the failure, but first prepending
+     * the word "Fail" to the output.
      * @param output string builder
      * @param commands list of commands
      * @param commandsLength total number of commands
@@ -358,22 +361,23 @@ public class LogicEngine {
     }
 
     /**
-     * Append to an output string another token
-     * @param output
-     * @param append
+     * Given an output StringBuilder, append the specified string to the StringBuilder
+     *
+     * @param output an already created string builder
+     * @param append string to append
      */
-    public static void appendOutput(StringBuilder output, String append) {
+    static void appendOutput(StringBuilder output, String append) {
         if (output.length() > 0) {
             output.append(";");
         }
         output.append(append);
     }
 
-    /**
-     * For debugging specifically
-     */
-    public void printDatabase() {
-        be.printAllProjects(conn);
-        be.printAllTables(conn);
-    }
+//    /**
+//     * For debugging specifically
+//     */
+//    public void printDatabase() {
+//        be.printAllProjects(conn);
+//        be.printAllTables(conn);
+//    }
 }

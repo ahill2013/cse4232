@@ -74,7 +74,7 @@ public class BackEnd {
      */
     public boolean createProject(Connection conn, String projectName, int tasks) {
         try {
-            String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "','" + tasks + "')";
+            String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "'," + tasks + ")";
             Statement create = conn.createStatement();
             create.executeUpdate(addProjectName);
             if (tasks > 0) {
@@ -82,8 +82,6 @@ public class BackEnd {
                 String dropTable = "DROP TABLE IF EXISTS '" + taskTable + "'";
                 create.execute(dropTable);
                 conn.commit();
-                printAllTables(conn);
-                System.out.println(taskTable);
                 final String createTable = "CREATE TABLE '" + taskTable +
                         "'(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
@@ -257,7 +255,7 @@ public class BackEnd {
             Statement state = conn.createStatement();
             ResultSet resultSet = state.executeQuery(query);
             resultSet.next();
-            tasks = resultSet.getInt(1);
+            tasks = Integer.parseInt(resultSet.getString("TASKS"));
             conn.commit();
         } catch (SQLException e) {
             return -1;
@@ -350,6 +348,7 @@ public class BackEnd {
             System.out.println(rsmd.getColumnCount());
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("NAME"));
+                System.out.println(resultSet.getString("TASKS"));
                 //System.out.println(resultSet.getString("ID"));
             }
         } catch (SQLException e) {

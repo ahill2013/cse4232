@@ -215,7 +215,6 @@ public class LogicEngine {
                         _failure = true;
                     } else {
                         String project = commands[index + 1];
-
                         // Get the number of tasks for the project. If zero then just print out project.
                         // If less than one then the project does not exist or there is a database problem.
                         // Otherwise execute retrieval

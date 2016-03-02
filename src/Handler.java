@@ -101,13 +101,17 @@ public class Handler {
                     if (line == null) {
                         break;
                     }
-                    //System.out.println(line);
-                    String output = engine.parseInput(line, IP, clientPort);
-                    //System.out.println(output);
-                    writer.write("\n");
-                    writer.write(output);
-                    writer.write("\n");
-                    writer.flush();
+                    if (line.equals("")) { // if no input then do nothing and wait for more
+                        writer.flush();
+                    } else {
+                        //System.out.println(line);
+                        String output = engine.parseInput(line, IP, clientPort);
+                        //System.out.println(output);
+                        writer.write("\n");
+                        writer.write(output);
+                        writer.write("\n");
+                        writer.flush();
+                    }
                 }
                 sock.close();
 

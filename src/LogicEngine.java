@@ -85,7 +85,6 @@ public class LogicEngine {
                     try {
                         name = commandArg[1];
                     } catch (IndexOutOfBoundsException e) {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                         break;
                     }
@@ -100,7 +99,6 @@ public class LogicEngine {
                         String[] nums = commands[numIndex].split(":");
                         // If the name for the next command is wrong break
                         if (!nums[0].equals("TASKS") || !(nums.length == 2)) {
-                            failureFormat(output, commands, commands.length, index);
                             _failure = true;
                             break;
                         }
@@ -109,19 +107,16 @@ public class LogicEngine {
                         try {
                             numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
                         } catch (Exception e) {
-                            failureFormat(output, commands, commands.length, index);
                             _failure = true;
                             break;
                         }
                     } else {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                         break;
                     }
 
                     // If there aren't enough names and times for the number of tasks break
                     if ((tasksIndex + 3*numTasks) > commands.length) {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                         break;
                     }
@@ -147,7 +142,6 @@ public class LogicEngine {
                         appendOutput(output, "OK");
                         projectOutput(output, commands, index, tasksIndex);
                     } else {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                         break; // Not strictly necessary but makes more sense here
                     }
@@ -157,7 +151,6 @@ public class LogicEngine {
                 case "TAKE":
                     // If there aren't enough strings to fill commands
                     if ((index + 3) > commands.length) {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                         break;
                     } else {
@@ -167,7 +160,6 @@ public class LogicEngine {
                         // If format of strings is not correct output failure and break
                         if (user.length != 2 || project.length !=2 ||
                                 !user[0].equals("USER") || !project[0].equals("PROJECT")) {
-                            failureFormat(output, commands, commands.length, index);
                             _failure = true;
                             break;
                         }
@@ -182,7 +174,6 @@ public class LogicEngine {
                             appendOutput(output, commands[index + 2]);
                             appendOutput(output, commands[index + 3]);
                         } else {
-                            failureFormat(output, commands, commands.length, index);
                             _failure = true;
                             break;
                         }
@@ -204,14 +195,12 @@ public class LogicEngine {
                         }
                         index += 1;
                     } catch (SQLException e) {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                     }
                     break;
                 case "GET_PROJECT":
                     // If there is not project name, break
                     if (!((index + 1) < commands.length)) {
-                        failureFormat(output, commands, commands.length, index);
                         _failure = true;
                     } else {
                         String project = commands[index + 1];
@@ -224,7 +213,6 @@ public class LogicEngine {
                             appendOutput(output, "PROJECT_DEFINITION:" + project);
                             index += 2;
                         } else if (numberTasks < 0) {
-                            failureFormat(output, commands, commands.length, index);
                             _failure = true;
                         } else {
                             LinkedList<String[]> tasks = be.getTasks(conn,project);
@@ -267,10 +255,14 @@ public class LogicEngine {
                     break;
                 default:
                     // If not a recognizable command output failure
-                    failureFormat(output, commands, commands.length, index);
                     _failure = true;
             }
         }
+
+        if (_failure) {
+            failureFormat(output, commands, commands.length, index);
+        }
+
         output.append("\n");
         be.closeConnection(conn);
         return output.toString();

@@ -29,7 +29,7 @@ public class TestLogicEngine {
             String listTasks = engine.parseInput("GET_PROJECT;Exam", "127.0.0.1", 2356);
             System.out.print(listTasks);
 
-            engine.printDatabase();
+ //           engine.printDatabase();
             engine.closeLogicEngine();
         } catch (SQLException e) {
             e.printStackTrace();

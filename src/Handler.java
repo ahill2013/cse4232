@@ -31,7 +31,13 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-
+/**
+ * Brings up TCP socket connection and reads commands until ended. Program can be closed by using
+ * the command EXIT or QUIT. Accepts a single connection at a time. If a connection is closed, then
+ * the server waits for a new client to open another connection.
+ *
+ *     Main class that runs the server
+ */
 public class Handler {
 
     /**

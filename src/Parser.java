@@ -23,12 +23,22 @@ import org.apache.commons.cli.*;
 
 import java.util.LinkedList;
 
+/**
+ * Interprets options and command lines passed to it from the Handler or potentially from other
+ * sources in the future.
+ */
 public class Parser {
     public enum CODES {START, EXIT, RETRIEVE, RECORD}
 
     private Options opts;
     private CommandLineParser parser;
 
+    /**
+     * Takes in the list of options and tries to build a command line.
+     *
+     * @param options — list of string arrays where each array is an option
+     * @throws IllegalArgumentException if improper number of arguments were given
+     */
     public Parser(LinkedList<String[]> options) throws IllegalArgumentException {
         opts = new Options();
         for (String[] opt: options) {
@@ -62,10 +72,24 @@ public class Parser {
         return parser.parse(opts, args, true);
     }
 
+    /**
+     * Given an array of strings representing the tokens entered on the command line, return the
+     * already created command line parser’s interpretation of those commands with the options
+     * initialized at run time.
+     *
+     * @param args string array of tokens from command line
+     * @return parser’s interpretation of the given commands
+     * @throws ParseException
+     */
     public CommandLine getCMD(String[] args) throws ParseException {
         return parser.parse(opts, args, true);
     }
 
+    /**
+     * Returns a parser for use by whoever desires
+     *
+     * @return parser for interpreting command lines represented as string arrays of tokens
+     */
     public static CommandLineParser getDefaultParser() {
         return new DefaultParser();
     }

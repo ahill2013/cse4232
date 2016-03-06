@@ -55,30 +55,36 @@ public class Handler {
      */
     public static void main(final String [] args) {
 
-        // Attempting to find correct path. This should get the directory
-        // from which the program and JVM was started.
+        // The following is here in case the program is not started with run.sh, or a test script
+        // It finds a relative path and does some error checking
+
+        // Attempting to find correct path. This should get the directory from which the program and
+        // JVM was started.
         // NOTE:  This should not be the "Current working directory"
         String currentRelativePath = Paths.get("").toAbsolutePath().toString();
 
-        // This is here in case ony one argument is passed to run.sh.  For example: run.sh 2132
-        // It will add -p and -d to the "command line args," and a default path for the SQLite db file
-        // since one was not provided when the program was started.
-        String[] newArgs = new String[4];
-        if (args.length == 1) {
-            newArgs[0] = "-p";
-            newArgs[1] = args[0];
-            newArgs[2] = "-d";
-            newArgs[3] = currentRelativePath + "/temp.db";
-        } else // If there is more than one arg, use the command-line args as normal
-            for (int i=0; i<4; i++)
-                newArgs[i] = args[i];
+        String [] finalArgs = new String[0];
+        if (args.length == 2) {
+            if (args[0].equals("-p")) {
+                System.out.println("Using port: " + args[1]);
+                finalArgs = new String[]{args[0], args[1], "-d", "temp.db"};
+            }
+            else if (args[0].equals("-d")) {
+                System.out.println("Using default port: 2132");
+                finalArgs = new String[]{"-p", "2132", args[0], args[1]};
+            }
+        } else {
+            finalArgs = new String[args.length];
+            for (int i=0; i<finalArgs.length; i++)
+                finalArgs[i] = args[i];
+        }
 
         Parser parseArgs = new Parser(setArgs());
         LogicEngine engine;
         CommandLine cmd;
 
         try {
-            cmd = parseArgs.getCMD(newArgs);
+            cmd = parseArgs.getCMD(finalArgs);
             //TODO:Make sure that any file works with the engine
             //TODO:If given abbreviated file name, get full file path
             engine = new LogicEngine(cmd.getOptionValue("d"));

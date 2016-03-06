@@ -110,9 +110,9 @@ public class BackEnd {
      * Go to the PROJECTS_LIST table and return all of the projects as a list of strings (names)
      * @param conn already opened connection to an sqlite database
      * @return string of names. Returns "Failure" as first and only string in list if it fails to read from the database
-     * This is weird but also suprisingly useful.
+     * This is weird but also surprisingly useful.
      */
-    LinkedList<String> getAllProjects(Connection conn) throws SQLException {
+    public LinkedList<String> getAllProjects(Connection conn) throws SQLException {
         LinkedList<String> projects = new LinkedList<>();
         Statement create = conn.createStatement();
         ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
@@ -264,8 +264,8 @@ public class BackEnd {
 
     /**
      * Each project has a different task project list. Problem queries have their issue characters replaced
-     * @param projectName
-     * @return
+     * @param projectName project name
+     * @return gets the unique task table name for a project
      */
     private String getTaskTable(String projectName) {
         //return projectName.replaceAll("[ */&?;]", "__") + "_tasks";

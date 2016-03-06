@@ -253,6 +253,11 @@ public class LogicEngine {
                         }
                     }
                     break;
+                case "EXIT":
+                case "exit":
+                case "QUIT":
+                case "quit":
+                    System.exit(0);
                 default:
                     // If not a recognizable command output failure
                     _failure = true;

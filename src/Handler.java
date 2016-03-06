@@ -61,7 +61,7 @@ public class Handler {
         // Attempting to find correct path. This should get the directory from which the program and
         // JVM was started.
         // NOTE:  This should not be the "Current working directory"
-        String currentRelativePath = Paths.get("").toAbsolutePath().toString();
+        //String currentRelativePath = Paths.get("").toAbsolutePath().toString();
 
         String [] finalArgs = new String[0];
         if (args.length == 2) {

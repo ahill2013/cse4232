@@ -12,11 +12,11 @@ elif [ $# -eq 2 ]
 then
     if [ $1 = "-p" ]
     then
-        echo "Using port number: ${1}"
+        # echo "Using port number: ${1}"
         java -cp bin/externals/*:bin/*.class:bin:. Handler $1 $2
     elif [ $1 = "-d" ]
     then
-        echo "Using default port number: 2132"
+        # echo "Using default port number: 2132"
         java -cp bin/externals/*:bin/*.class:bin:. Handler -p 2132 -d $2
     fi
 elif [ $# -eq 4 ]

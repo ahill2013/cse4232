@@ -34,7 +34,7 @@ import java.util.LinkedList;
 public class LogicEngine {
     BackEnd be;
     private Connection conn;
-    private String dbFile;
+    final private String dbFile;
 
     /**
      * Checks whether proposed database location exists and if a database does not
@@ -42,7 +42,7 @@ public class LogicEngine {
      * @param dbLocation proposed location
      * @throws SQLException if creating/opening database fails
      */
-    public LogicEngine(String dbLocation) throws SQLException {
+    public LogicEngine(final String dbLocation) throws SQLException {
         dbFile = dbLocation;
         be = new BackEnd(dbFile);
     }
@@ -55,7 +55,7 @@ public class LogicEngine {
      * @return output response to parsing and executing commands
      * @throws SQLException if connection fails to close
      */
-    public String parseInput(String input, String IP, int port) throws SQLException {
+    public String parseInput(final String input, final String IP, final int port) throws SQLException {
 
         // Open connection. If connection fails then kill the program. Any errors here are unforeseen
         try {
@@ -68,7 +68,7 @@ public class LogicEngine {
 
         // Initialize commands structure and output string
         StringBuilder output = new StringBuilder();
-        String[] commands = input.split(";");
+        final String[] commands = input.split(";");
 
         // if failure becomes true then loop ends and all input after index is printed
         // Loop until all commands in string are parsed
@@ -79,7 +79,7 @@ public class LogicEngine {
             String[] commandArg = commands[index].split(":");
             switch (commandArg[0]) {
                 case "PROJECT_DEFINITION":
-                    String name = null;
+                    String name;
 
                     // Is there a name for the project?
                     try {
@@ -89,10 +89,10 @@ public class LogicEngine {
                         break;
                     }
 
-                    int commandIndex = index;
-                    int numIndex = index + 1;
+                    // int commandIndex = index;
+                    final int numIndex = index + 1;
                     int tasksIndex = index + 2;
-                    int numTasks = 0;
+                    final int numTasks;
 
                     // If there is a project definition and nothing after it then go to else and break
                     if (numIndex < commands.length) {
@@ -164,9 +164,9 @@ public class LogicEngine {
                             break;
                         }
 
-                        String userArg = user[1];
-                        String projectArg = project[1];
-                        String task = commands[index + 3];
+                        final String userArg = user[1];
+                        final String projectArg = project[1];
+                        final String task = commands[index + 3];
                         // If user is set execute output otherwise fail and break
                         if (be.setUser(conn, projectArg, task, userArg)) {
                             appendOutput(output, "OK");
@@ -203,11 +203,11 @@ public class LogicEngine {
                     if (!((index + 1) < commands.length)) {
                         _failure = true;
                     } else {
-                        String project = commands[index + 1];
+                        final String project = commands[index + 1];
                         // Get the number of tasks for the project. If zero then just print out project.
                         // If less than one then the project does not exist or there is a database problem.
                         // Otherwise execute retrieval
-                        int numberTasks = be.getNumberTasks(conn, project);
+                        final int numberTasks = be.getNumberTasks(conn, project);
                         if (numberTasks == 0) {
                             appendOutput(output, "OK");
                             appendOutput(output, "PROJECT_DEFINITION:" + project);
@@ -282,7 +282,7 @@ public class LogicEngine {
      * @param index index to begin from
      * @param tasksIndex the index of the end of the tasks
      */
-    private void projectOutput(StringBuilder output, String[] commands, int index, int tasksIndex) {
+    private void projectOutput(StringBuilder output, final String[] commands, final int index, final int tasksIndex) {
         for (int i = index; i < tasksIndex; i++) {
             appendOutput(output, commands[i]);
         }
@@ -297,7 +297,7 @@ public class LogicEngine {
      * @param commandsLength total number of commands
      * @param index index to begin failure formatting from
      */
-    private static void failureFormat(StringBuilder output, String[] commands, int commandsLength, int index) {
+    private static void failureFormat(StringBuilder output, final String[] commands, final int commandsLength, final int index) {
         appendOutput(output, "Fail");
         for (int i = index; i < commandsLength; i++) {
             appendOutput(output, commands[i]);
@@ -311,10 +311,10 @@ public class LogicEngine {
      * @param tasks the number of tasks to read
      * @return whether all of the status's were successfully checked. Will return false if a table is locked or corrupted
      */
-    private boolean checkStatus(String project, LinkedList<String[]> tasks) {
+    private boolean checkStatus(final String project, LinkedList<String[]> tasks) {
         for (String[] part : tasks) {
             if (Integer.parseInt(part[4]) == 0) {
-                int done = isDone(part[2]);
+                final int done = isDone(part[2]);
                 if (done == 1) {
                     be.setStatus(conn, project, part[0], done);
                 } else if (done == Integer.MAX_VALUE) {
@@ -330,14 +330,14 @@ public class LogicEngine {
      * @param end string representing the time of completion
      * @return compareTo() output after string has been formatted for simple date format
      */
-    private int isDone(String end) {
+    private int isDone(final String end) {
         try {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
+            final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
             String update = end.replace('m', '-');
             update = update.replace('s', '-');
             update = update.replace('h', '-');
-            Date endTime = dateFormat.parse(update);
-            Date current = new Date();
+            final Date endTime = dateFormat.parse(update);
+            final Date current = new Date();
             return current.compareTo(endTime);
         } catch (Exception e) {
             e.printStackTrace();
@@ -363,7 +363,7 @@ public class LogicEngine {
      * @param output an already created string builder
      * @param append string to append
      */
-    static void appendOutput(StringBuilder output, String append) {
+    static void appendOutput(StringBuilder output, final String append) {
         if (output.length() > 0) {
             output.append(";");
         }

@@ -81,7 +81,7 @@ public class Parser {
      * @return parser’s interpretation of the given commands
      * @throws ParseException
      */
-    public CommandLine getCMD(String[] args) throws ParseException {
+    public CommandLine getCMD(final String[] args) throws ParseException {
         return parser.parse(opts, args, true);
     }
 

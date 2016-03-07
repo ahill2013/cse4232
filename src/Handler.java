@@ -27,13 +27,13 @@ import java.net.BindException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
-import java.nio.file.Paths;
+//import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
 /**
  * Brings up TCP socket connection and reads commands until ended. Program can be closed by using
- * the command EXIT or QUIT. Accepts a single connection at a time. If a connection is closed, then
+ * the commands EXIT or QUIT. Accepts a single connection at a time. If a connection is closed, then
  * the server waits for a new client to open another connection.
  *
  *     Main class that runs the server
@@ -89,52 +89,30 @@ public class Handler {
         LogicEngine engine;
         CommandLine cmd;
 
+        final int maxConnections = -1;
+        int currentConnections = 0;
+
         try {
             cmd = parseArgs.getCMD(finalArgs);
             //TODO:Make sure that any file works with the engine
             //TODO:If given abbreviated file name, get full file path
             engine = new LogicEngine(cmd.getOptionValue("d"));
 
-            ServerSocket server = new ServerSocket(Integer.parseInt(cmd.getOptionValue("p")));
+            int port = Integer.parseInt(cmd.getOptionValue("p"));
+            ServerSocket server = new ServerSocket(port);
 
             System.out.println("Waiting for connection from client...\n");
 
-            for(;;) {
-                Socket sock = server.accept();   // accept connection
-                // Get the IP address the client connected from.
-                // We use substring() because toString() returns "HOSTNAME/physicalIP".
-                // We have no use for the hostname in our case, so we take the physical IP address only
-                String IP = sock.getInetAddress().toString().substring(sock.getInetAddress().toString().indexOf('/') + 1);
-                int clientPort = sock.getPort(); // get the port the client is connected to
+            while (currentConnections < maxConnections || maxConnections == -1) {
+                Thread tcpThread = new Thread(new TCPHandler(server.accept(), engine));
+                //Thread udpThread = new Thread(new UDPHandler(port));
+                tcpThread.start();
+                //udpThread.start();
+                //currentConnections++;
 
-                System.out.println("Connected: " + IP);
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-
-                // Greet User upon connection to server
-                writer.write("Hello User! You may now enter a command.\n\n");
-                writer.flush();
-
-                for (;;) {
-                    String line = reader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    if (line.equals("")) { // if no input then do nothing and wait for more
-                        writer.flush();
-                    } else {
-                        //System.out.println(line);
-                        String output = engine.parseInput(line, IP, clientPort);
-                        //System.out.println(output);
-                        writer.write("\n");
-                        writer.write(output);
-                        writer.write("\n");
-                        writer.flush();
-                    }
-                }
-                sock.close();
-
+                //tcpThread.join();
+                //udpThread.join();
+                //currentConnections--;
             }
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
@@ -152,6 +130,8 @@ public class Handler {
         } catch (SQLException e) {
             System.err.println("Could not access database. Does the program have write rights to the directory?");
             System.exit(-1);
+        //} catch (InterruptedException e) {
+        //    e.printStackTrace();
         }
 
     }

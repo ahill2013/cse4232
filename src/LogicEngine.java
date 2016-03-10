@@ -42,7 +42,7 @@ public class LogicEngine {
      * @param dbLocation proposed location
      * @throws SQLException if creating/opening database fails
      */
-    public LogicEngine(final String dbLocation) throws SQLException {
+    public LogicEngine(final String dbLocation) {
         dbFile = dbLocation;
     }
 
@@ -54,7 +54,7 @@ public class LogicEngine {
      * @return output response to parsing and executing commands
      * @throws SQLException if connection fails to close
      */
-    public String parseInput(final String input, final String IP, final int port) throws SQLException {
+    public synchronized String parseInput(final String input, final String IP, final int port) throws SQLException {
 
         // Open connection. If connection fails then kill the program. Any errors here are unforeseen
         try {
@@ -348,7 +348,9 @@ public class LogicEngine {
      */
     public void closeLogicEngine() {
         try {
-            BackEnd.closeConnection(conn);
+            if (conn != null) {
+                BackEnd.closeConnection(conn);
+            }
 
         } catch (SQLException e) {
             System.err.println("ERROR: Can't close connection in LogicEngine");

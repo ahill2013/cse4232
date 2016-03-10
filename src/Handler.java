@@ -101,6 +101,7 @@ public class Handler {
 
             System.out.println("Waiting for connection from client...\n");
 
+            Thread tcpServer
             while (currentConnections < maxConnections || maxConnections == -1) {
                 Thread tcpThread = new Thread(new TCPHandler(server.accept(), engine));
                 //Thread udpThread = new Thread(new UDPHandler(port));

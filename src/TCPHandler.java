@@ -29,9 +29,11 @@ public class TCPHandler implements Runnable {
     private Socket sock;
     private LogicEngine engine;
 
-    public TCPHandler(Socket sock, LogicEngine engine) {
+    private boolean _running = true;
+
+    public TCPHandler(Socket sock, String dbFile) {
         this.sock = sock;
-        this.engine = engine;
+        engine = new LogicEngine(dbFile);
     }
 
     @Override
@@ -53,7 +55,14 @@ public class TCPHandler implements Runnable {
             writer.write("Hello User! You may now enter a command.\n\n");
             writer.flush();
 
-            for (;;) {
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    engine.closeLogicEngine();
+                }
+            });
+
+            while (_running) {
                 String line = reader.readLine();
                 if (line == null) {
                     break;
@@ -76,7 +85,12 @@ public class TCPHandler implements Runnable {
             e.printStackTrace();
         } catch (SQLException e) {
             System.err.println("Could not access database. Does the program have write rights to the directory?");
-            System.exit(-1);
+        } finally {
+            engine.closeLogicEngine(); //TODO:not sure about this
         }
+    }
+
+    public void terminate() {
+        _running = false;
     }
 }

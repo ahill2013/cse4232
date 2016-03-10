@@ -12,16 +12,16 @@ public class TestBackEnd {
         BackEnd be = null;
         Connection conn = null;
         try {
-            be = new BackEnd("/home/armin1215/Networks/test.db");
+            BackEnd.openDatabase("/home/armin1215/Networks/test.db");
             //be = new BackEnd("/home/adam/Documents/NP/Milestone 2/server/cse4232/test.db");
-            conn = be.openConnection();
+            conn = BackEnd.openConnection("/home/armin1215/Networks/test.db");
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
         }
         int num_tasks = 2;
         String project = "Testing2";
-        be.createProject(conn, project, 2);
+        BackEnd.createProject(conn, project, 2);
         String buy = "Buy paper";
         String start_buy = "2016-03-12:18h30m00s001Z";
         String end_buy = "2016-03-15:18h30m00s001Z";
@@ -33,29 +33,29 @@ public class TestBackEnd {
         String IP = "127.0.0.1";
         int port = 2356;
 
-        be.insertTask(conn, project, buy, start_buy, end_buy, IP, port);
-        be.insertTask(conn, project, write, start_write, end_write, IP, port);
+        BackEnd.insertTask(conn, project, buy, start_buy, end_buy, IP, port);
+        BackEnd.insertTask(conn, project, write, start_write, end_write, IP, port);
 
 //        be.printAllProjects(conn);
 //        be.printAllTables(conn);
 //
 //        be.printRowsInTable(conn, project, false);
 
-        be.setUser(conn, project, buy, "Johnny");
-        be.setUser(conn, project, write, "Mary");
-        be.setStatus(conn, project, buy, 1);
+        BackEnd.setUser(conn, project, buy, "Johnny");
+        BackEnd.setUser(conn, project, write, "Mary");
+        BackEnd.setStatus(conn, project, buy, 1);
 
         System.out.println(be.getNumberTasks(conn, project));
         System.out.println(be.getNumberTasks(conn, "Exam1"));
 
 
         try {
-            LinkedList<String> projects = be.getAllProjects(conn);
+            LinkedList<String> projects = BackEnd.getAllProjects(conn);
             for (String proj : projects) {
                 System.out.println(proj);
             }
 
-            LinkedList<String[]> tasks = be.getTasks(conn, project);
+            LinkedList<String[]> tasks = BackEnd.getTasks(conn, project);
             for (String[] task : tasks) {
                 for (String part : task) {
                     System.out.print(part + " ");
@@ -67,7 +67,7 @@ public class TestBackEnd {
         }
 
         try {
-            be.closeConnection(conn);
+            BackEnd.closeConnection(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }

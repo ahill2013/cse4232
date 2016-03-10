@@ -12,6 +12,7 @@ public class TestLogicEngine {
     public static void main(final String[] args) {
 
         try {
+            BackEnd.openDatabase("/home/armin1215/Networks/test.db");
             LogicEngine engine = new LogicEngine("/home/armin1215/Networks/test.db");
             //LogicEngine engine = new LogicEngine("/home/adam/Documents/NP/Milestone 2/server/cse4232/test.db");
 

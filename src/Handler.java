@@ -101,18 +101,13 @@ public class Handler {
 
             System.out.println("Waiting for connection from client...\n");
 
-            Thread tcpServer
-            while (currentConnections < maxConnections || maxConnections == -1) {
-                Thread tcpThread = new Thread(new TCPHandler(server.accept(), engine));
-                //Thread udpThread = new Thread(new UDPHandler(port));
-                tcpThread.start();
-                //udpThread.start();
-                //currentConnections++;
+            final Thread tcpServer = new Thread(new TCPThreadedServer(port, cmd.getOptionValue("d")));
+            final Thread udpServer = new Thread(new UDPThreadedServer(port, cmd.getOptionValue("d")));
+            tcpServer.start();
+            udpServer.start();
+            // tcpServer.join();
+            // udpServer.join();
 
-                //tcpThread.join();
-                //udpThread.join();
-                //currentConnections--;
-            }
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
@@ -126,12 +121,9 @@ public class Handler {
         } catch (IOException e) {
             System.out.println("Problem connecting to socket");
             e.printStackTrace();
-        } catch (SQLException e) {
-            System.err.println("Could not access database. Does the program have write rights to the directory?");
-            System.exit(-1);
+        }
         //} catch (InterruptedException e) {
         //    e.printStackTrace();
-        }
 
     }
 

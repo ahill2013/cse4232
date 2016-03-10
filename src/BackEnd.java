@@ -58,18 +58,17 @@ public class BackEnd {
     private static final int TASKLISTSIZE = 7;
     public String _dbFile;
 
-    /**
-     * Creates database if not already created with projects_list. Each instance is ready to handle queries and updates
-     * for the database that is input into its system.
-     *
-     * @param dbPath the relative path to the file. May error if program does not have write permissions to location.
-     * @throws SQLException error caused when database is locked, does not exist, or directory does not exist
-     * or permissions are not given
-     */
-    public BackEnd(String dbPath) throws SQLException {
-        openDatabase(dbPath);
-        _dbFile = dbPath;
-    }
+//    /**
+//     * Creates database if not already created with projects_list. Each instance is ready to handle queries and updates
+//     * for the database that is input into its system.
+//     *
+//     * @param dbPath the relative path to the file. May error if program does not have write permissions to location.
+//     * @throws SQLException error caused when database is locked, does not exist, or directory does not exist
+//     * or permissions are not given
+//     */
+//    public BackEnd(String dbPath) throws SQLException {
+//        openDatabase(dbPath);
+//    }
 
     /**
      * Creates a project by inserting it into the list of projects in the database and creating a table for all of the
@@ -83,7 +82,7 @@ public class BackEnd {
      * @param tasks number of tasks in the project
      * @return whether project was created successfully
      */
-    public boolean createProject(Connection conn, String projectName, int tasks) {
+    public static boolean createProject(Connection conn, String projectName, int tasks) {
         try {
             String addProjectName = "REPLACE INTO PROJECTS_LIST(NAME, TASKS) VALUES('" + projectName + "'," + tasks + ")";
             Statement create = conn.createStatement();
@@ -112,7 +111,7 @@ public class BackEnd {
      * @return string of names. Returns "Failure" as first and only string in list if it fails to read from the database
      * This is weird but also surprisingly useful.
      */
-    public LinkedList<String> getAllProjects(Connection conn) throws SQLException {
+    public static LinkedList<String> getAllProjects(Connection conn) throws SQLException {
         LinkedList<String> projects = new LinkedList<>();
         Statement create = conn.createStatement();
         ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
@@ -151,7 +150,7 @@ public class BackEnd {
      * @param task task name
      * @param status integer status (0 = done, 1 = waiting)
      */
-    public void setStatus(Connection conn, String project, String task, int status) {
+    public static void setStatus(Connection conn, String project, String task, int status) {
         try {
             String query = "UPDATE '" + getTaskTable(project) + "' SET STATUS = " + status + " WHERE NAME = '" + task + "'";
             Statement create = conn.createStatement();
@@ -171,7 +170,7 @@ public class BackEnd {
      * @param user the owner to be added
      * @return whether adding owner was successful
      */
-    public boolean setUser(Connection conn, String project, String task, String user) {
+    public static boolean setUser(Connection conn, String project, String task, String user) {
         try {
             String query = "UPDATE '" + getTaskTable(project) + "' SET OWNER = '" + user + "' WHERE NAME = '" + task + "'";
             Statement create = conn.createStatement();
@@ -196,7 +195,7 @@ public class BackEnd {
      * @param port port task was set from
      * @return whether task was added successfully
      */
-    public boolean insertTask(Connection conn, String projectName, String task, String start, String end, String IP, int port) {
+    public static boolean insertTask(Connection conn, String projectName, String task, String start, String end, String IP, int port) {
         if (!isValidDate(start) || !isValidDate(end)) {
             return false;
         }
@@ -220,7 +219,7 @@ public class BackEnd {
      * @param date start or end time to be evaluated
      * @return whether string represents a properly formatted date or not
      */
-    public boolean isValidDate(String date) {
+    public static boolean isValidDate(String date) {
         try {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh-mm-ss-SSS'Z'");
             String update =date.replace('m', '-');
@@ -240,7 +239,7 @@ public class BackEnd {
      * @return list of strings. List is single string "Failure" if tasks failed to read. Basically escapes throwing
      * exception.
      */
-    public LinkedList<String[]> getTasks(Connection conn, String project) {
+    public static LinkedList<String[]> getTasks(Connection conn, String project) {
         LinkedList<String[]> tasks = new LinkedList<>();
         try {
             Statement create = conn.createStatement();
@@ -267,7 +266,7 @@ public class BackEnd {
      * @param projectName project name
      * @return gets the unique task table name for a project
      */
-    private String getTaskTable(String projectName) {
+    private static String getTaskTable(String projectName) {
         //return projectName.replaceAll("[ */&?;]", "__") + "_tasks";
         return projectName + "_tasks";
     }
@@ -278,7 +277,7 @@ public class BackEnd {
      * @param project project name
      * @return number of tasks for project
      */
-    public int getNumberTasks(Connection conn, String project) {
+    public static int getNumberTasks(Connection conn, String project) {
         int tasks;
         try {
             String query = "SELECT * FROM " + PROJECTS + " WHERE NAME = '" + project + "'";
@@ -313,7 +312,7 @@ public class BackEnd {
      * @param dbFile proposed location for database
      * @throws SQLException if the database location is not accessible or writable
      */
-    private void openDatabase(String dbFile) throws SQLException {
+    public static void openDatabase(String dbFile) throws SQLException {
         Connection conn = null;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
 
@@ -328,8 +327,8 @@ public class BackEnd {
      * @return an open sqlite connection to the database
      * @throws SQLException if the database is locked or there are concurrency issues
      */
-    public Connection openConnection() throws SQLException {
-        Connection c = DriverManager.getConnection("jdbc:sqlite:" + _dbFile);
+    public static Connection openConnection(String dbFile) throws SQLException {
+        Connection c = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
         c.setAutoCommit(false);
         return c;
     }
@@ -339,7 +338,7 @@ public class BackEnd {
      * @param c already open connection to database
      * @throws SQLException if the connection cannot be closed
      */
-    public void closeConnection(Connection c) throws SQLException {
+    public static void closeConnection(Connection c) throws SQLException {
         c.close();
     }
 

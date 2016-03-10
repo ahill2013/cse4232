@@ -94,8 +94,6 @@ public class Handler {
 
         try {
             cmd = parseArgs.getCMD(finalArgs);
-            //TODO:Make sure that any file works with the engine
-            //TODO:If given abbreviated file name, get full file path
             engine = new LogicEngine(cmd.getOptionValue("d"));
 
             int port = Integer.parseInt(cmd.getOptionValue("p"));

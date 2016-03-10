@@ -44,7 +44,6 @@ public class LogicEngine {
      */
     public LogicEngine(final String dbLocation) throws SQLException {
         dbFile = dbLocation;
-        be = new BackEnd(dbFile);
     }
 
     /**
@@ -59,8 +58,7 @@ public class LogicEngine {
 
         // Open connection. If connection fails then kill the program. Any errors here are unforeseen
         try {
-            be = new BackEnd(dbFile);
-            conn = be.openConnection();
+            conn = BackEnd.openConnection(dbFile);
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -122,14 +120,14 @@ public class LogicEngine {
                     }
 
                     //create project with name and tasks and implicit task table if number of task is greater than zero
-                    boolean projectCreated = be.createProject(conn, commandArg[1], numTasks);
+                    boolean projectCreated = BackEnd.createProject(conn, commandArg[1], numTasks);
                     boolean taskCreated = true;
 
                     // If project is successfully created add tasks
                     if (projectCreated) {
 
                         for (int i = 0; i < numTasks; i++) {
-                            taskCreated = be.insertTask(conn, name, commands[tasksIndex], commands[tasksIndex + 1], commands[tasksIndex + 2], IP, port);
+                            taskCreated = BackEnd.insertTask(conn, name, commands[tasksIndex], commands[tasksIndex + 1], commands[tasksIndex + 2], IP, port);
                             tasksIndex += 3;
                             if (!taskCreated) {
                                 break;
@@ -168,7 +166,7 @@ public class LogicEngine {
                         final String projectArg = project[1];
                         final String task = commands[index + 3];
                         // If user is set execute output otherwise fail and break
-                        if (be.setUser(conn, projectArg, task, userArg)) {
+                        if (BackEnd.setUser(conn, projectArg, task, userArg)) {
                             appendOutput(output, "OK");
                             appendOutput(output, commands[index + 1]);
                             appendOutput(output, commands[index + 2]);
@@ -184,7 +182,7 @@ public class LogicEngine {
                 case "GET_PROJECTS":
                     // Get all projects and append to output unless database is locked or does not exist. If locked print failure
                     try {
-                        LinkedList<String> projects = be.getAllProjects(conn);
+                        LinkedList<String> projects = BackEnd.getAllProjects(conn);
                         appendOutput(output, "OK");
                         appendOutput(output, "PROJECTS:" + projects.size());
 
@@ -207,7 +205,7 @@ public class LogicEngine {
                         // Get the number of tasks for the project. If zero then just print out project.
                         // If less than one then the project does not exist or there is a database problem.
                         // Otherwise execute retrieval
-                        final int numberTasks = be.getNumberTasks(conn, project);
+                        final int numberTasks = BackEnd.getNumberTasks(conn, project);
                         if (numberTasks == 0) {
                             appendOutput(output, "OK");
                             appendOutput(output, "PROJECT_DEFINITION:" + project);
@@ -215,11 +213,11 @@ public class LogicEngine {
                         } else if (numberTasks < 0) {
                             _failure = true;
                         } else {
-                            LinkedList<String[]> tasks = be.getTasks(conn,project);
+                            LinkedList<String[]> tasks = BackEnd.getTasks(conn,project);
                             // Check whether all projects are done or waiting and whether their status needs
                             // to be changed
                             if (checkStatus(project, tasks)) {
-                                tasks = be.getTasks(conn, project);
+                                tasks = BackEnd.getTasks(conn, project);
                                 appendOutput(output, "OK");
                                 appendOutput(output, "PROJECT_DEFINITION:" + project);
                                 appendOutput(output, "TASKS:" + tasks.size());
@@ -269,7 +267,7 @@ public class LogicEngine {
         }
 
         output.append("\n");
-        be.closeConnection(conn);
+        BackEnd.closeConnection(conn);
         return output.toString();
     }
 
@@ -316,7 +314,7 @@ public class LogicEngine {
             if (Integer.parseInt(part[4]) == 0) {
                 final int done = isDone(part[2]);
                 if (done == 1) {
-                    be.setStatus(conn, project, part[0], done);
+                    BackEnd.setStatus(conn, project, part[0], done);
                 } else if (done == Integer.MAX_VALUE) {
                     return false;
                 }
@@ -350,7 +348,7 @@ public class LogicEngine {
      */
     public void closeLogicEngine() {
         try {
-            be.closeConnection(conn);
+            BackEnd.closeConnection(conn);
 
         } catch (SQLException e) {
             System.err.println("ERROR: Can't close connection in LogicEngine");

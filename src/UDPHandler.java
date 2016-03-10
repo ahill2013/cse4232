@@ -37,7 +37,7 @@ public class UDPHandler implements Runnable {
     @Override
     public void run() {
 
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[65508];
         packet = new DatagramPacket(buffer, buffer.length);
 
         for (;;) {

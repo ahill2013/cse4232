@@ -25,6 +25,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 public class UDPHandler implements Runnable {
@@ -33,7 +34,7 @@ public class UDPHandler implements Runnable {
     private boolean _running = true;
     private LogicEngine engine;
 
-    public UDPHandler(int port, String dbFile) throws SocketException {
+    public UDPHandler(int port, String dbFile) {
         _port = port;
         engine = new LogicEngine(dbFile);
     }
@@ -41,7 +42,7 @@ public class UDPHandler implements Runnable {
     @Override
     public void run() {
         try {
-            byte[] buffer = new byte[65508];
+            byte[] buffer = new byte[32767];
             DatagramSocket socket = new DatagramSocket(_port);
             DatagramPacket receive = new DatagramPacket(buffer, buffer.length);
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -50,6 +51,8 @@ public class UDPHandler implements Runnable {
                     engine.closeLogicEngine();
                 }
             });
+
+            System.out.println("Waiting for connection from client");
 
             while (_running) {
                 try {
@@ -63,7 +66,7 @@ public class UDPHandler implements Runnable {
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
 
-                    System.out.println(buffer.toString());
+                    System.out.println(new String(buffer, StandardCharsets.UTF_8));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
@@ -79,5 +82,6 @@ public class UDPHandler implements Runnable {
 
     public void stop() {
         _running = false;
+        engine.closeLogicEngine();
     }
 }

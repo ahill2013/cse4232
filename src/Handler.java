@@ -93,7 +93,13 @@ public class Handler {
         int currentConnections = 0;
 
         try {
+
             cmd = parseArgs.getCMD(finalArgs);
+            try {
+                BackEnd.openDatabase(cmd.getOptionValue("d"));
+            } catch (SQLException e) {
+                System.err.println("Invalid location for database or corrupted database");
+            }
             engine = new LogicEngine(cmd.getOptionValue("d"));
 
             int port = Integer.parseInt(cmd.getOptionValue("p"));
@@ -102,11 +108,12 @@ public class Handler {
             // System.out.println("Waiting for connection from client...\n");
 
             final Thread tcpServer = new Thread(new TCPThreadedServer(port, cmd.getOptionValue("d")));
-            //final Thread udpServer = new Thread(new UDPThreadedServer(port, cmd.getOptionValue("d")));
+            final Thread udpServer = new Thread(new UDPHandler(port, cmd.getOptionValue("d")));
             tcpServer.start();
-            // udpServer.start();
+            udpServer.start();
             try {
                 tcpServer.join();
+                udpServer.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

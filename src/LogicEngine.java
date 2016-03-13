@@ -256,9 +256,14 @@ public class LogicEngine {
                 case "QUIT":
                 case "quit":
                     System.exit(0);
+                    break;
+                case "":
+                    index += 1;
+                    break;
                 default:
                     // If not a recognizable command output failure
-                    _failure = true;
+                    if (commands[commands.length - 1].charAt(0) == 0x00){ index = commands.length;}
+                    else { _failure = true; }
             }
         }
 

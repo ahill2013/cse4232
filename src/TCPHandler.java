@@ -92,5 +92,6 @@ public class TCPHandler implements Runnable {
 
     public void terminate() {
         _running = false;
+        engine.closeLogicEngine();
     }
 }

@@ -13,6 +13,7 @@ public class TCPThreadedServer implements Runnable {
 
 
     public TCPThreadedServer(int port, String dbFile) {
+        _port = port;
         _dbFile = dbFile;
     }
 

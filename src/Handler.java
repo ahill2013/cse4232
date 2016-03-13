@@ -97,31 +97,36 @@ public class Handler {
             engine = new LogicEngine(cmd.getOptionValue("d"));
 
             int port = Integer.parseInt(cmd.getOptionValue("p"));
-            ServerSocket server = new ServerSocket(port);
+            //ServerSocket server = new ServerSocket(port);
 
-            System.out.println("Waiting for connection from client...\n");
+            // System.out.println("Waiting for connection from client...\n");
 
             final Thread tcpServer = new Thread(new TCPThreadedServer(port, cmd.getOptionValue("d")));
-            final Thread udpServer = new Thread(new UDPThreadedServer(port, cmd.getOptionValue("d")));
+            //final Thread udpServer = new Thread(new UDPThreadedServer(port, cmd.getOptionValue("d")));
             tcpServer.start();
-            udpServer.start();
-            // tcpServer.join();
+            // udpServer.start();
+            try {
+                tcpServer.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             // udpServer.join();
 
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
             System.exit(-1);
-        } catch (BindException e) {
-            System.err.println("Port already in use. Specify a different port.");
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found");
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (IOException e) {
-            System.out.println("Problem connecting to socket");
-            e.printStackTrace();
         }
+//        } catch (BindException e) {
+//            System.err.println("Port already in use. Specify a different port.");
+//        } catch (FileNotFoundException e) {
+//            System.err.println("File not found");
+//            e.printStackTrace();
+//            System.exit(-1);
+//        } catch (IOException e) {
+//            System.out.println("Problem connecting to socket");
+//            e.printStackTrace();
+//        }
         //} catch (InterruptedException e) {
         //    e.printStackTrace();
 

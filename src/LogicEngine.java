@@ -19,8 +19,6 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -32,7 +30,6 @@ import java.util.LinkedList;
  * Parses single line of input from the user.
  */
 public class LogicEngine {
-    BackEnd be;
     private Connection conn;
     final private String dbFile;
 

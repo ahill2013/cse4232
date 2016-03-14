@@ -31,6 +31,7 @@
  * getProjects
  * closeConnection end a connection
  ****************************************************************/
+
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -55,8 +56,7 @@ public class BackEnd {
      * The String file is in case the connection is closed and someone wishes to reopen the connection.
      */
     private static final String PROJECTS = "PROJECTS_LIST";
-    private static final int TASKLISTSIZE = 7;
-    public String _dbFile;
+//    private static final int TASKLISTSIZE = 7;
 
 //    /**
 //     * Creates database if not already created with projects_list. Each instance is ready to handle queries and updates
@@ -313,7 +313,7 @@ public class BackEnd {
      * @throws SQLException if the database location is not accessible or writable
      */
     public static void openDatabase(String dbFile) throws SQLException {
-        Connection conn = null;
+        Connection conn;
         String pub = "CREATE TABLE IF NOT EXISTS " + PROJECTS + " (NAME TEXT PRIMARY KEY, TASKS INT NOT NULL)";
 
         conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
@@ -353,108 +353,112 @@ public class BackEnd {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//    //Testing functions
-//    void printAllTables(Connection conn) {
-//        try {
-//            Statement create = conn.createStatement();
-//            ResultSet tables = create.executeQuery("SELECT NAME FROM sqlite_master WHERE type='table'");
-//            while (tables.next()) {
-//                String name = tables.getString("NAME");
-//                System.out.println(name);
-////                String query = "SELECT Count(*) FROM " + name;
-//                //System.out.println(rows);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    void printAllProjects(Connection conn) {
-//        try {
-//            Statement create = conn.createStatement();
-//            ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
-//            ResultSetMetaData rsmd = resultSet.getMetaData();
-//            System.out.println(rsmd.getColumnCount());
-//            while (resultSet.next()) {
-//                System.out.println(resultSet.getString("NAME"));
-//                System.out.println(resultSet.getString("TASKS"));
-//                //System.out.println(resultSet.getString("ID"));
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    void printRowsInTable(Connection conn, String tableName, boolean project_list) {
-//        try {
-//            String table = tableName;
-//            if (!project_list) {
-//                table = getTaskTable(tableName);
-//            }
-//
-//            Statement create = conn.createStatement();
-//            ResultSet resultSet = create.executeQuery("SELECT * FROM '" + table + "'");
-//            ResultSetMetaData rsmd = resultSet.getMetaData();
-//            int columns = rsmd.getColumnCount();
-//
-//            for (int i = 1; i <= columns; i++) {
-//                System.out.println(rsmd.getColumnName(i));
-//            }
-//
-//            while (resultSet.next()) {
-//                StringBuilder flash = new StringBuilder();
-//                for (int i = 1; i <= columns; i++) {
-//                    flash.append(resultSet.getString(i) + " ");
-//                }
-//                System.out.println(flash);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void removeTasks(Connection conn, String projectName) {
-//        try {
-//            String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);
-//            Statement state = conn.createStatement();
-//            state.execute(query);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//
-//    /*
-//     * Cleaning the database if desired for testing
-//     */
-//    public void removeTask(Connection conn, String projectName, String task) {
-//        try {
-//            String query = "DELETE FROM '" + getTaskTable(projectName) + "' WHERE NAME = '" + task + "'";
-//            Statement state = conn.createStatement();
-//            state.execute(query);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public String[] getTask(Connection conn, String projectName, String task) {
-//        String[] retrievedTask = new String[TASKLISTSIZE];
-//        try {
-//            Statement create = conn.createStatement();
-//            ResultSet resultSet = create.executeQuery("SELECT * FROM '" + getTaskTable(projectName)
-//                    + "' WHERE NAME = '" + task + "'");
-//            ResultSetMetaData rsmd = resultSet.getMetaData();
-//            int columns = rsmd.getColumnCount();
-//            for (int i = 1; i <= columns; i++) {
-//                retrievedTask[i-1] = resultSet.getString(i);
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            System.err.flush();
-//        }
-//
-//        return retrievedTask;
-//    }
+    //Testing functions
+/*
+    void printAllTables(Connection conn) {
+        try {
+            Statement create = conn.createStatement();
+            ResultSet tables = create.executeQuery("SELECT NAME FROM sqlite_master WHERE type='table'");
+            while (tables.next()) {
+                String name = tables.getString("NAME");
+                System.out.println(name);
+//                String query = "SELECT Count(*) FROM " + name;
+                //System.out.println(rows);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void printAllProjects(Connection conn) {
+        try {
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            System.out.println(rsmd.getColumnCount());
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString("NAME"));
+                System.out.println(resultSet.getString("TASKS"));
+                //System.out.println(resultSet.getString("ID"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void printRowsInTable(Connection conn, String tableName, boolean project_list) {
+        try {
+            String table = tableName;
+            if (!project_list) {
+                table = getTaskTable(tableName);
+            }
+
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM '" + table + "'");
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columns = rsmd.getColumnCount();
+
+            for (int i = 1; i <= columns; i++) {
+                System.out.println(rsmd.getColumnName(i));
+            }
+
+            while (resultSet.next()) {
+                StringBuilder flash = new StringBuilder();
+                for (int i = 1; i <= columns; i++) {
+                    flash.append(resultSet.getString(i) + " ");
+                }
+                System.out.println(flash);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeTasks(Connection conn, String projectName) {
+        try {
+            String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    */
+    /*
+     * Cleaning the database if desired for testing
+     *//*
+
+    public void removeTask(Connection conn, String projectName, String task) {
+        try {
+            String query = "DELETE FROM '" + getTaskTable(projectName) + "' WHERE NAME = '" + task + "'";
+            Statement state = conn.createStatement();
+            state.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] getTask(Connection conn, String projectName, String task) {
+        String[] retrievedTask = new String[TASKLISTSIZE];
+        try {
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM '" + getTaskTable(projectName)
+                    + "' WHERE NAME = '" + task + "'");
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columns = rsmd.getColumnCount();
+            for (int i = 1; i <= columns; i++) {
+                retrievedTask[i-1] = resultSet.getString(i);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.err.flush();
+        }
+
+        return retrievedTask;
+    }
+*/
 
 }

@@ -26,7 +26,7 @@ public class Client {
 
     public static void udpTest(String inet, int port, String command) throws UnknownHostException {
         final byte[] input = command.getBytes();
-        final byte[] data = new byte[32767];
+        final byte[] data = new byte[32768];
 
 
         final InetAddress inetAddress = InetAddress.getByName(inet);

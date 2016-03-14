@@ -21,13 +21,6 @@
 
 import org.apache.commons.cli.*;
 
-import java.io.*;
-
-import java.net.BindException;
-import java.net.Socket;
-import java.net.ServerSocket;
-
-//import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 

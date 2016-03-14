@@ -6,7 +6,7 @@ echo
 PORT=2135
 PROJECT_NAME=Exam2
 
-java -cp bin/externals/*:bin/*.class:bin:. Handler -p ${PORT} -d script1Test.db &
+java -cp bin/externals/*:bin/*.class:bin:. Handler -p ${PORT} -d script1Test.db > /dev/null 2>&1 &
 
 sleep 1
 
@@ -25,5 +25,5 @@ sleep 1
 echo "GET_PROJECT;${PROJECT_NAME}"
 echo "GET_PROJECT;${PROJECT_NAME}" | netcat localhost ${PORT}
 sleep 1
-echo "EXIT"
 echo "EXIT" | netcat localhost ${PORT}
+echo "EXIT : script1.sh has finished"

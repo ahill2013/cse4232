@@ -64,11 +64,6 @@ public class Handler {
         // The following is here in case the program is not started with run.sh, or a test script
         // It finds a relative path and does some error checking
 
-        // Attempting to find correct path. This should get the directory from which the program and
-        // JVM was started.
-        // NOTE:  This should not be the "Current working directory"
-        //String currentRelativePath = Paths.get("").toAbsolutePath().toString();
-
         String [] finalArgs = new String[0];
         if (args.length == 2) {
             if (args[0].equals("-p")) {
@@ -86,11 +81,7 @@ public class Handler {
         }
 
         Parser parseArgs = new Parser(setArgs());
-        LogicEngine engine;
         CommandLine cmd;
-
-        final int maxConnections = -1;
-        int currentConnections = 0;
 
         try {
 
@@ -100,10 +91,8 @@ public class Handler {
             } catch (SQLException e) {
                 System.err.println("Invalid location for database or corrupted database");
             }
-            engine = new LogicEngine(cmd.getOptionValue("d"));
 
             int port = Integer.parseInt(cmd.getOptionValue("p"));
-            //ServerSocket server = new ServerSocket(port);
 
             // System.out.println("Waiting for connection from client...\n");
 
@@ -117,25 +106,12 @@ public class Handler {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // udpServer.join();
 
         } catch (ParseException e) {
             System.err.println("Illegal argument entered");
             e.printStackTrace();
             System.exit(-1);
         }
-//        } catch (BindException e) {
-//            System.err.println("Port already in use. Specify a different port.");
-//        } catch (FileNotFoundException e) {
-//            System.err.println("File not found");
-//            e.printStackTrace();
-//            System.exit(-1);
-//        } catch (IOException e) {
-//            System.out.println("Problem connecting to socket");
-//            e.printStackTrace();
-//        }
-        //} catch (InterruptedException e) {
-        //    e.printStackTrace();
 
     }
 

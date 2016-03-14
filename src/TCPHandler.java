@@ -20,7 +20,6 @@
 /* ------------------------------------------------------------------------- */
 
 import java.io.*;
-import java.net.BindException;
 import java.net.Socket;
 import java.sql.SQLException;
 
@@ -46,7 +45,7 @@ public class TCPHandler implements Runnable {
             final String IP = sock.getInetAddress().toString().substring(sock.getInetAddress().toString().indexOf('/') + 1);
             final int clientPort = sock.getPort(); // get the port the client is connected to
 
-            System.out.println("Connected: " + IP);
+            System.out.println("TCP Connection: " + IP);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
@@ -81,6 +80,10 @@ public class TCPHandler implements Runnable {
             }
 
             sock.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found");
+            e.printStackTrace();
+            System.exit(-1);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {

@@ -42,7 +42,7 @@ public class UDPHandler implements Runnable {
     @Override
     public void run() {
         try {
-            byte[] buffer = new byte[32767];
+            byte[] buffer = new byte[32768];
             DatagramSocket socket = new DatagramSocket(_port);
             DatagramPacket receive = new DatagramPacket(buffer, buffer.length);
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -52,8 +52,6 @@ public class UDPHandler implements Runnable {
                 }
             });
 
-            System.out.println("Waiting for connection from client");
-
             while (_running) {
                 try {
 
@@ -61,12 +59,14 @@ public class UDPHandler implements Runnable {
                     InetAddress packet_address = receive.getAddress();
                     int packet_port = receive.getPort();
 
-                    byte[] reply = engine.parseInput(new String(receive.getData()), packet_address.toString(), packet_port).getBytes();
+                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n",
+                            "").replaceAll("\0", ""), packet_address.toString(), packet_port).getBytes();
 
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
 
                     System.out.println(new String(buffer, StandardCharsets.UTF_8));
+                    receive.setData(new byte[buffer.length]);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {

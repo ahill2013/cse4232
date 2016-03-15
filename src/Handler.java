@@ -55,7 +55,7 @@ public class Handler {
     public static void main(final String [] args) {
 
         // The following is here in case the program is not started with run.sh, or a test script
-        // It finds a relative path and does some error checking
+        // It mostly does some error checking
 
         String [] finalArgs = new String[0];
         if (args.length == 2) {
@@ -69,8 +69,7 @@ public class Handler {
             }
         } else {
             finalArgs = new String[args.length];
-            for (int i=0; i<finalArgs.length; i++)
-                finalArgs[i] = args[i];
+            System.arraycopy(args, 0, finalArgs, 0, finalArgs.length);
         }
 
         Parser parseArgs = new Parser(setArgs());

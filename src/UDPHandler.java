@@ -53,18 +53,17 @@ public class UDPHandler implements Runnable {
 
             while (_running) {
                 try {
-
                     socket.receive(receive);
                     InetAddress packet_address = receive.getAddress();
                     int packet_port = receive.getPort();
 
-                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n",
-                            "").replaceAll("\0", ""), packet_address.toString(), packet_port).getBytes();
+                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
+                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
 
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
 
-                    System.out.println(new String(buffer, StandardCharsets.UTF_8));
+                    //System.out.println(new String(buffer, StandardCharsets.UTF_8));
                     receive.setData(new byte[buffer.length]);
                 } catch (IOException e) {
                     e.printStackTrace();

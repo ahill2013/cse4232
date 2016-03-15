@@ -11,31 +11,30 @@ CLSDIR = bin/
 EXT = externals/
 CLSS = $(addprefix ${CLSDIR},Parser.class BackEnd.class LogicEngine.class TCPHandler.class \
         TCPThreadedServer.class UDPHandler.class Handler.class)
-SRCS = $(addprefix ${SRCDIR},Parser.java BackEnd.java LogicEngine.java TCPHandler.java \
-        TCPThreadedServer.java UDPHandler.java Handler.java)
+#SRCS = $(addprefix ${SRCDIR},Parser.java BackEnd.java LogicEngine.java TCPHandler.java \
+#        TCPThreadedServer.java UDPHandler.java Handler.java)
 
 JDBC_DEST = ${CLSDIR}${JDBC}
 CLI_DEST = ${CLSDIR}${CLI}
 
 .PHONY: all clean
 
-# TODO: make is compiling everything twice before excluding them if no change was made
 all: ${CLSDIR} $(CLSS) | ${CLSDIR}
 
 ${CLSDIR}TCPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR},TCPHandler.java LogicEngine.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLSDIR} ${SRCDIR}TCPHandler.java
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}TCPHandler.java
 
 ${CLSDIR}TCPThreadedServer.class: ${CLSDIR} $(addprefix ${SRCDIR},TCPThreadedServer.java TCPHandler.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLSDIR} ${SRCDIR}TCPThreadedServer.java
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}TCPThreadedServer.java
 
 ${CLSDIR}UDPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR},UDPHandler.java LogicEngine.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLSDIR} ${SRCDIR}UDPHandler.java
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}UDPHandler.java
 
 ${CLSDIR}Handler.class: ${CLSDIR} $(addprefix ${SRCDIR},Handler.java Parser.java BackEnd.java TCPThreadedServer.java UDPHandler.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLI_DEST}:${CLSDIR} ${SRCDIR}Handler.java
+	$(JC) -d ${CLSDIR} -cp ${CLI_DEST}:${SRCDIR} ${SRCDIR}Handler.java
 
 ${CLSDIR}LogicEngine.class: ${CLSDIR} $(addprefix ${SRCDIR},LogicEngine.java BackEnd.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLSDIR} ${SRCDIR}LogicEngine.java
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}LogicEngine.java
 
 ${CLSDIR}Parser.class: ${CLSDIR} ${SRCDIR}Parser.java | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${CLI_DEST} ${SRCDIR}Parser.java
@@ -49,4 +48,4 @@ ${CLSDIR}:
 	cp -r ${CLI} ${CLSDIR}${EXT}
 
 clean:
-	rm -rf ${CLSDIR}
+	${RM}r ${CLSDIR} *.db

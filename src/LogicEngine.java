@@ -37,7 +37,6 @@ public class LogicEngine {
      * Checks whether proposed database location exists and if a database does not
      * already exist with the given name then creates a database
      * @param dbLocation proposed location
-     * @throws SQLException if creating/opening database fails
      */
     public LogicEngine(final String dbLocation) {
         dbFile = dbLocation;

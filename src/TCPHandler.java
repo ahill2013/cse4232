@@ -23,20 +23,42 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
 
+/**
+ * Handles one client's interaction with the server by using the LogicEngine to open a
+ * new connection to the database and continue parsing input from the client until the client ends the interaction
+ * or the program is concluded.
+ *
+ * Uses Runnable with the methods run() and terminate()
+ *
+ * Started by normal method tcpHandlerInstance.start() and has a shutdown hook built in to force graceful termination.
+ */
 public class TCPHandler implements Runnable {
 
+    /**
+     * Socket to receive input from (socket received from creator)
+     * engine is the input parser and contains the database interaction
+     * _running is a flag set to false when the thread is asked to finish
+     */
     private Socket sock;
     private LogicEngine engine;
-
     private boolean _running = true;
 
+    /**
+     * Sets the client socket connection and gives the location of the database for the LogicEngine to use
+     * @param sock already created connection to client
+     * @param dbFile location of already created database
+     */
     public TCPHandler(Socket sock, String dbFile) {
         this.sock = sock;
         engine = new LogicEngine(dbFile);
     }
 
+    /**
+     * Parses input from the client connection until the connection is closed. Replies to each set of commands
+     * with a buffered reader and writer
+     */
     @Override
-    public void run() {
+    public synchronized void run() {
 
         try {
             // Get the IP address the client connected from.
@@ -54,24 +76,27 @@ public class TCPHandler implements Runnable {
             writer.write("Hello User! You may now enter a command.\n\n");
             writer.flush();
 
+            // Force graceful shutdown
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    engine.closeLogicEngine();
+                    terminate();
                 }
             });
 
+            // Read the input until the client closes the connection or until the server is closed
             while (_running) {
                 String line = reader.readLine();
                 if (line == null) {
                     break;
                 }
+                if (line.equals("EXIT") || line.equals("QUIT")) {
+                    break;
+                }
                 if (line.equals("")) { // if no input then do nothing and wait for more
                     writer.flush();
                 } else {
-                    //System.out.println(line);
                     String output = engine.parseInput(line, IP, clientPort);
-                    //System.out.println(output);
                     writer.write("\n");
                     writer.write(output);
                     writer.write("\n");
@@ -81,7 +106,7 @@ public class TCPHandler implements Runnable {
 
             sock.close();
         } catch (FileNotFoundException e) {
-            System.err.println("File not found");
+            System.err.println("File not found for the database");
             e.printStackTrace();
             System.exit(-1);
         } catch (IOException e) {
@@ -89,12 +114,14 @@ public class TCPHandler implements Runnable {
         } catch (SQLException e) {
             System.err.println("Could not access database. Does the program have write rights to the directory?");
         } finally {
-            engine.closeLogicEngine(); //TODO:not sure about this
+            engine.closeLogicEngine();
         }
     }
 
+    /**
+     * Called on shutdown to tell the handler to stop reading input from the client and close the connection
+     */
     public void terminate() {
         _running = false;
-        engine.closeLogicEngine();
     }
 }

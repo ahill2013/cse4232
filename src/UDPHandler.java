@@ -26,51 +26,85 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Arrays;
 
+/**
+ * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of
+ * 2^15 bytes; however, such size is not recommended because the reply may be significantly longer and cause
+ * the UDP Handler to raise an exception.
+ *
+ * Implements Runnable with methods run() and terminate()
+ *
+ * Opened as a thread which forces graceful shutdown
+ */
 public class UDPHandler implements Runnable {
 
+    private static final int BUFFER_SIZE = 32768;
+    /**
+     * _port is the port that the handler must listen to
+     * _running is a flag to track whether program is being terminated
+     * engine is an input parser inputs containing a connection instance for the database
+     */
     private int _port;
     private boolean _running = true;
     private LogicEngine engine;
 
+    /**
+     * Creates instance of UDP Handler, saves the port the handler listens to, and attempts to start a connection
+     * to the database.
+     *
+     * @param port is the port the server is listening on
+     * @param dbFile is the location of the already created database
+     */
     public UDPHandler(int port, String dbFile) {
         _port = port;
         engine = new LogicEngine(dbFile);
     }
 
+    /**
+     * Opens a UDP DatagramSocket listening on the predefined port and handling all UDP interactions.
+     * The handler takes a packet, reinterprets it into a String for the instance of LogicEngine, and then replies
+     * to the client. The next packet is then loaded until the shutdown hook is activated at which point the thread
+     * terminates
+     */
     @Override
-    public void run() {
+    public synchronized void run() {
         try {
-            byte[] buffer = new byte[32768];
             DatagramSocket socket = new DatagramSocket(_port);
-            DatagramPacket receive = new DatagramPacket(buffer, buffer.length);
+            DatagramPacket receive = new DatagramPacket(new byte[BUFFER_SIZE], BUFFER_SIZE);
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    engine.closeLogicEngine();
+                    terminate();
                 }
             });
 
             while (_running) {
                 try {
+                    // Receive
                     socket.receive(receive);
                     InetAddress packet_address = receive.getAddress();
                     int packet_port = receive.getPort();
 
+                    // Interpret
                     byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
                             packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
 
+                    // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
 
-                    //System.out.println(new String(buffer, StandardCharsets.UTF_8));
-                    receive.setData(new byte[buffer.length]);
+                    // Reset the receive buffer for the next buffer (prevents overflow and over-read)
+                    receive.setData(new byte[BUFFER_SIZE]);
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
                     System.out.println("Could not open database for UDP packet");
                 }
             }
+            socket.close();
         } catch (SocketException e) {
             e.printStackTrace();
         } finally {
@@ -78,8 +112,10 @@ public class UDPHandler implements Runnable {
         }
     }
 
-    public void stop() {
+    /**
+     * Tell the program to stop running
+     */
+    public void terminate() {
         _running = false;
-        engine.closeLogicEngine();
     }
 }

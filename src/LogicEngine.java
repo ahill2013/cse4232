@@ -64,6 +64,7 @@ public class LogicEngine {
         StringBuilder output = new StringBuilder();
         final String[] commands = input.split(";");
 
+        commands[commands.length - 1] = commands[commands.length - 1].replaceAll("\0", "");
         // if failure becomes true then loop ends and all input after index is printed
         // Loop until all commands in string are parsed
         boolean _failure = false;
@@ -246,12 +247,6 @@ public class LogicEngine {
                             }
                         }
                     }
-                    break;
-                case "EXIT":
-                case "exit":
-                case "QUIT":
-                case "quit":
-                    System.exit(0);
                     break;
                 case "":
                     index += 1;

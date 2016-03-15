@@ -49,7 +49,7 @@ public class Handler {
     }
 
     /**
-     * Brings the server online and then begins reading and writing to clients.
+     * Brings the server online by starting the TCP and UDP handlers and then waits until it is shutdown manually.
      * @param args command line arguments -p port# -d databasefile.db
      */
     public static void main(final String [] args) {

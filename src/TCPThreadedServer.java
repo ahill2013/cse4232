@@ -23,6 +23,10 @@ import java.net.BindException;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+/**
+ * Listens for all client connections to the server and then starts a TCPHandler to handle each client connection.
+ *
+ */
 public class TCPThreadedServer implements Runnable {
 
     private String _dbFile;

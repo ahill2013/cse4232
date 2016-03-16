@@ -45,6 +45,10 @@ public class TCPThreadedServer implements Runnable {
         try {
             ServerSocket tcpServer = new ServerSocket(_port);
 
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+              @Override
+              public void run() { terminate(); }
+            });
             //System.out.println("Waiting for connection from client...\n");
             while (_running) {
                 final Thread tcpHandler = new Thread(new TCPHandler(tcpServer.accept(), _dbFile));
@@ -59,7 +63,7 @@ public class TCPThreadedServer implements Runnable {
         }
     }
 
-    public void stop() {
+    public void terminate() {
         _running = false;
     }
 }

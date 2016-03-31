@@ -1,11 +1,9 @@
-import java.io.FileNotFoundException;
+package test;
+
+import server.BackEnd;
+import server.LogicEngine;
+
 import java.sql.SQLException;
-
-/**
- * Created by adam on 2/24/16.
- */
-
-
 
 public class TestLogicEngine {
 

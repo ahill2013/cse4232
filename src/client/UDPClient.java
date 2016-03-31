@@ -19,6 +19,8 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
+package client;
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;

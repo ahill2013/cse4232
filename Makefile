@@ -9,10 +9,10 @@ CLI = externals/commons-cli-1.3.1.jar
 MKDIR = mkdir -p
 CLSDIR = bin/
 EXT = externals/
-CLSS = $(addprefix ${CLSDIR},Parser.class BackEnd.class LogicEngine.class TCPHandler.class \
+CLIENTDIR = client/
+SERVERDIR = server/
+CLSS = $(addprefix ${CLSDIR}${SERVERDIR},Parser.class BackEnd.class LogicEngine.class TCPHandler.class \
         TCPThreadedServer.class UDPHandler.class Handler.class)
-#SRCS = $(addprefix ${SRCDIR},Parser.java BackEnd.java LogicEngine.java TCPHandler.java \
-#        TCPThreadedServer.java UDPHandler.java Handler.java)
 
 JDBC_DEST = ${CLSDIR}${JDBC}
 CLI_DEST = ${CLSDIR}${CLI}
@@ -21,29 +21,31 @@ CLI_DEST = ${CLSDIR}${CLI}
 
 all: ${CLSDIR} $(CLSS) | ${CLSDIR}
 
-${CLSDIR}TCPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR},TCPHandler.java LogicEngine.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}TCPHandler.java
+${CLSDIR}${SERVERDIR}TCPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR}${SERVERDIR},TCPHandler.java LogicEngine.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}${SERVERDIR}TCPHandler.java
 
-${CLSDIR}TCPThreadedServer.class: ${CLSDIR} $(addprefix ${SRCDIR},TCPThreadedServer.java TCPHandler.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}TCPThreadedServer.java
+${CLSDIR}${SERVERDIR}TCPThreadedServer.class: ${CLSDIR} $(addprefix ${SRCDIR}${SERVERDIR},TCPThreadedServer.java TCPHandler.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}${SERVERDIR}TCPThreadedServer.java
 
-${CLSDIR}UDPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR},UDPHandler.java LogicEngine.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}UDPHandler.java
+${CLSDIR}${SERVERDIR}UDPHandler.class: ${CLSDIR} $(addprefix ${SRCDIR}${SERVERDIR},UDPHandler.java LogicEngine.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}${SERVERDIR}UDPHandler.java
 
-${CLSDIR}Handler.class: ${CLSDIR} $(addprefix ${SRCDIR},Handler.java Parser.java BackEnd.java TCPThreadedServer.java UDPHandler.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLI_DEST}:${SRCDIR} ${SRCDIR}Handler.java
+${CLSDIR}${SERVERDIR}Handler.class: ${CLSDIR} $(addprefix ${SRCDIR}${SERVERDIR},Handler.java Parser.java BackEnd.java TCPThreadedServer.java UDPHandler.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CLI_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}Handler.java
 
-${CLSDIR}LogicEngine.class: ${CLSDIR} $(addprefix ${SRCDIR},LogicEngine.java BackEnd.java) | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}LogicEngine.java
+${CLSDIR}${SERVERDIR}LogicEngine.class: ${CLSDIR} $(addprefix ${SRCDIR}${SERVERDIR},LogicEngine.java BackEnd.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}${SERVERDIR}LogicEngine.java
 
-${CLSDIR}Parser.class: ${CLSDIR} ${SRCDIR}Parser.java | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CLI_DEST} ${SRCDIR}Parser.java
+${CLSDIR}${SERVERDIR}Parser.class: ${CLSDIR} ${SRCDIR}${SERVERDIR}Parser.java | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CLI_DEST} ${SRCDIR}${SERVERDIR}Parser.java
 
-${CLSDIR}BackEnd.class: ${CLSDIR} ${SRCDIR}BackEnd.java | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${JDBC_DEST} ${SRCDIR}BackEnd.java
+${CLSDIR}${SERVERDIR}BackEnd.class: ${CLSDIR} ${SRCDIR}${SERVERDIR}BackEnd.java | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${JDBC_DEST} ${SRCDIR}${SERVERDIR}BackEnd.java
 
 ${CLSDIR}:
 	${MKDIR} ${CLSDIR}${EXT}
+	${MKDIR} ${CLSDIR}${CLIENTDIR}
+	${MKDIR} ${CLSDIR}${SERVERDIR}
 	cp -r ${JDBC} ${CLSDIR}${EXT}
 	cp -r ${CLI} ${CLSDIR}${EXT}
 

@@ -1,10 +1,10 @@
 /* ------------------------------------------------------------------------- */
 /*   Copyright (C) 2016
-                Author:  wnyffenegger2013@my.fit.edu
-                Author:  ahill2013@my.fit.edu
-                Florida Tech, Computer Science
+Author:  wnyffenegger2013@my.fit.edu
+Author:  ahill2013@my.fit.edu
+Florida Tech, Computer Science
 
-       This program is free software; you can redistribute it and/or modify
+This program is free software; you can redistribute it and/or modify
        it under the terms of the GNU Affero General Public License as published by
        the Free Software Foundation; either the current version of the License, or
        (at your option) any later version.
@@ -19,7 +19,7 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-
+package server;
 
 /**************************************************************
 * Important methods

@@ -19,6 +19,8 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
+package server;
+
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;

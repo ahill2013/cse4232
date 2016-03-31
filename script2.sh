@@ -7,7 +7,7 @@ PORT=2135
 PROJECT_NAME=Exam
 NETCAT="netcat localhost ${PORT}"
 
-java -cp bin/externals/*:bin/*.class:bin:. Handler -p ${PORT} -d script2Test.db > /dev/null 2>&1 &
+java -cp bin/externals/*:bin server.Handler -p ${PORT} -d script2Test.db > /dev/null 2>&1 &
 
 sleep 1
 

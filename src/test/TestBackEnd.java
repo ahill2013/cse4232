@@ -1,10 +1,11 @@
+package test;
+
+import server.BackEnd;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-/**
- * Created by armin1215 on 2/23/16.
- */
 public class TestBackEnd {
 
     public static void main(final String[] args) {

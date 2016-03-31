@@ -19,14 +19,14 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
+package server;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 /**
  * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of

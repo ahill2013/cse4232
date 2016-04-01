@@ -6,8 +6,11 @@ echo
 PORT=2135
 PROJECT_NAME=Exam2
 NETCAT="netcat localhost ${PORT}"
+DBDIR="../bin/testscripts/database"
 
-java -cp bin/externals/*:bin server.Handler -p ${PORT} -d script1Test.db > /dev/null 2>&1 &
+mkdir -p ${DBDIR}
+
+java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1Test.db > /dev/null 2>&1 &
 
 sleep 1
 

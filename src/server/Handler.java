@@ -23,6 +23,10 @@ package server;
 
 import org.apache.commons.cli.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -63,7 +67,14 @@ public class Handler {
         if (args.length == 2) {
             if (args[0].equals("-p")) {
                 System.out.println("Using port: " + args[1]);
-                finalArgs = new String[]{args[0], args[1], "-d", "temp.db"};
+                try {
+                    Path currentRelativePath = Paths.get("".concat("bin/server/database"));
+                    if (!Files.isDirectory(currentRelativePath))
+                        Files.createDirectory(currentRelativePath);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finalArgs = new String[]{args[0], args[1], "-d", "bin/server/database/temp.db"};
             }
             else if (args[0].equals("-d")) {
                 System.out.println("Using default port: 2132");

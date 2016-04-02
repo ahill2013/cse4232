@@ -27,6 +27,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.text.ParseException;
+
+import asn1.net.ddp2p.ASN1.*;
+import asn1objects.ASN1Task;
+import datatypes.Task;
+import net.ddp2p.ASN1.ASN1DecoderFail;
+import net.ddp2p.ASN1.Decoder;
+import net.ddp2p.ASN1.Encoder;
 
 /**
  * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of
@@ -87,9 +95,16 @@ public class UDPHandler implements Runnable {
                     int packet_port = receive.getPort();
 
                     // Interpret
-                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
-                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
+//                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
+//                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
 
+                    ASN1Task task = new ASN1Task();
+//                    Decoder dec = new Decoder(receive.getData());
+//                    dec.objectLen();
+                    Task t = task.decode(new Decoder(receive.getData()));
+                    ASN1Task response = new ASN1Task(t);
+                    Encoder asnresponse = response.getEncoder();
+                    byte[] reply = asnresponse.getBytes();
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
@@ -100,8 +115,13 @@ public class UDPHandler implements Runnable {
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (SQLException e) {
-                    System.out.println("Could not open database for UDP packet");
+//                } catch (SQLException e) {
+//                    System.out.println("Could not open database for UDP packet");
+                } catch (ParseException e) {
+                    System.out.println("Could not create ASN1Task class");
+                    e.printStackTrace();
+                } catch (ASN1DecoderFail e) {
+                    System.out.println("Could not parse message");
                 }
             }
             socket.close();

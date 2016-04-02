@@ -35,7 +35,7 @@ import java.util.LinkedList;
  * the commands EXIT or QUIT. Accepts a single connection at a time. If a connection is closed, then
  * the server waits for a new client to open another connection.
  *
- *     Main class that runs the server
+ *     Main class that runs the server.
  */
 public class Handler {
 

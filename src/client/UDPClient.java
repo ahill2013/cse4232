@@ -26,10 +26,14 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
 
-import asn1.net.ddp2p.ASN1.*;
+//import asn1.net.ddp2p.ASN1.*;
+import asn1objects.ASN1Project;
 import asn1objects.ASN1Task;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+//import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import datatypes.Project;
 import datatypes.Task;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
@@ -43,11 +47,21 @@ public class UDPClient {
         SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
         _port = Integer.parseInt(args[0]);
 
-        Task t = new Task("TEST", _sdf.parse("1980-01-01:01h01m01s001Z"), _sdf.parse("1980-01-01:01h01m01s001Z"), "localhost", 2235, false);
-        ASN1Task test = new ASN1Task(t);
+        Task t, t1;
+        List<Task> tasks = new LinkedList<Task>();
 
-        Encoder enc = test.getEncoder();
-        sendCommand(enc.getBytes());
+        t = new Task("TEST", _sdf.parse("1980-01-01:01h01m01s001Z"), _sdf.parse("1980-01-01:01h01m01s001Z"), "localhost", 2235, false);
+        t1 = new Task("test", _sdf.parse("1980-01-01:01h01m01s001Z"), _sdf.parse("1980-01-01:01h01m01s001Z"), "localhost", 2235, false);
+        tasks.add(t);
+        tasks.add(t1);
+
+
+        Project p = new Project("Test", tasks);
+        Encoder enc = new ASN1Project(p).getEncoder();
+//        ASN1Task test = new ASN1Task(t);
+//
+//        Encoder enc = test.getEncoder();
+            sendCommand(enc.getBytes());
 
         // The script being run will set args[1] to either a 1 or 2
 //        if (args[1].equals("1")) {
@@ -89,7 +103,7 @@ public class UDPClient {
 //        }
     }
 
-    private static void sendCommand(final byte[] input) throws UnknownHostException, ParseException{
+    private static void sendCommand(final byte[] input) throws UnknownHostException {
 
         DatagramSocket sock;
         DatagramPacket data;
@@ -100,7 +114,7 @@ public class UDPClient {
             data = new DatagramPacket(input, input.length, InetAddress.getByName("127.0.0.1"), _port);
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
-            Task t = new ASN1Task().decode(new Decoder(buffer));
+            Project t = new ASN1Project().decode(new Decoder(buffer));
             System.out.println(t.toString());
         } catch (SocketException e) {
             e.printStackTrace();

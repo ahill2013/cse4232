@@ -21,15 +21,18 @@ public class ASN1Task extends ASNObj {
     private Task task;
     private SimpleDateFormat _sdf;
 
-    public ASN1Task() throws ParseException {
+    public ASN1Task() {
         this(" ", "1970-01-01:01h01m01s001Z", "1980-01-01:01h01m01s001Z", "localhost", 0, false);
     }
 
 
-    public ASN1Task(String name, String start, String end, String ip, int port, boolean status) throws ParseException {
-
-        _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
-        task = new Task(name, _sdf.parse(start), _sdf.parse(end), ip, port, status);
+    public ASN1Task(String name, String start, String end, String ip, int port, boolean status) {
+        try {
+            _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
+            task = new Task(name, _sdf.parse(start), _sdf.parse(end), ip, port, status);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public ASN1Task(Task t) {
@@ -51,10 +54,10 @@ public class ASN1Task extends ASNObj {
         enc.addToSequence(new Encoder(task.getName()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(Long.toString(task.getStartTime().getTime())).setASN1Type(Encoder.TAG_GeneralizedTime));
         enc.addToSequence(new Encoder(Long.toString(task.getEndTime().getTime())).setASN1Type(Encoder.TAG_GeneralizedTime));
-        enc.addToSequence(new Encoder(task.getIP()).setASN1Type(Encoder.TAG_GeneralizedTime));
+        enc.addToSequence(new Encoder(task.getIP()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(task.getPort()).setASN1Type(Encoder.TAG_INTEGER));
         enc.addToSequence(new Encoder(task.getStatus()).setASN1Type(Encoder.TAG_BOOLEAN));
-        return enc.setASN1Type(Encoder.CLASS_APPLICATION, );
+        return enc.setASN1Type(Encoder.CLASS_APPLICATION,Encoder.PC_CONSTRUCTED,Encoder.TAG_SEQUENCE);
 
     }
 
@@ -63,8 +66,6 @@ public class ASN1Task extends ASNObj {
         final Decoder dec = decoder.getContent();
 
         String name = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
-//        String starting = dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime); //(Encoder.TAG_GeneralizedTime);
-//        long startingtwo = new Long(starting);
         Date start = new Date(Long.parseLong(dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime)));
         Date end = new Date(Long.parseLong(dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime)));
         String ip = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);

@@ -1,5 +1,6 @@
 package datatypes;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -13,14 +14,16 @@ public class Task {
     private int port;
     private boolean status;
 
+    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm's'ss's'SSS'Z'");
+
     public String toString() {
         final StringBuilder task = new StringBuilder();
-        task.append(name + "\n");
-        task.append("\t\t" + start + "\n");
-        task.append("\t\t" + end + "\n");
-        task.append("\t\t" + ip + "\n");
-        task.append("\t\t" + port + "\n");
-        task.append("\t\t" + status + "\n");
+        task.append(name + ";");
+        task.append(_sdf.format(start) + ";");
+        task.append(_sdf.format(end) + ";");
+        task.append(ip + ";");
+        task.append(port + ";");
+        task.append(status + ";");
         return task.toString();
     }
 

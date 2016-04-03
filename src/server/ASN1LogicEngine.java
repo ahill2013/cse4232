@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
-import asn1.net.ddp2p.ASN1.*;
+//import asn1.net.ddp2p.ASN1.*;
 import net.ddp2p.ASN1.Decoder;
 
 /**

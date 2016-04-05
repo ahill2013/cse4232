@@ -21,6 +21,16 @@ public class ProjectsAnswer {
         _projects = projects;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("OKProjects:" + _projects.size() + ";");
+
+        for (Project p : _projects) {
+            sb.append(p.toString());
+        }
+        return sb.toString();
+    }
     public void addProject(Project p) {
         _projects.add(p);
     }

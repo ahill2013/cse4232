@@ -14,6 +14,8 @@ import java.util.List;
  * Created by armin1215 on 3/31/16.
  */
 public class ASN1ProjectsAnswer {
+    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 5;
+
     private ProjectsAnswer _projectAns;
 
     public ASN1ProjectsAnswer(ProjectsAnswer p) {
@@ -34,7 +36,7 @@ public class ASN1ProjectsAnswer {
         for (Project p : _projectAns.getProjects()) {
             enc.addToSequence(new ASN1Project(p).getEncoder().setASN1Type(Encoder.TAG_SEQUENCE));
         }
-        return enc.setASN1Type(Encoder.CLASS_PRIVATE, Encoder.PC_CONSTRUCTED, Encoder.TAG_SEQUENCE);
+        return enc.setASN1Type(Encoder.CLASS_PRIVATE, Encoder.PC_CONSTRUCTED, (byte) (Encoder.TAG_SEQUENCE + 5));
     }
 
     public ProjectsAnswer decode(Decoder dec) throws ASN1DecoderFail {

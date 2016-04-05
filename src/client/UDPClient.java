@@ -58,6 +58,15 @@ public class UDPClient {
 
         Project p = new Project("Test", tasks);
         Encoder enc = new ASN1Project(p).getEncoder();
+        Encoder encTask = new ASN1Project(p).getEncoder();
+
+        Decoder decTask = new Decoder(encTask.getBytes());
+        Decoder dec = new Decoder(enc.getBytes());
+
+        System.out.println(dec.getTypeByte());
+        System.out.println(decTask.getTypeByte());
+
+
 //        ASN1Task test = new ASN1Task(t);
 //
 //        Encoder enc = test.getEncoder();
@@ -115,6 +124,7 @@ public class UDPClient {
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
             Project t = new ASN1Project().decode(new Decoder(buffer));
+
             System.out.println(t.toString());
         } catch (SocketException e) {
             e.printStackTrace();

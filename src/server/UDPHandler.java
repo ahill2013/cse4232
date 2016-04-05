@@ -26,14 +26,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.sql.SQLException;
 
-//import asn1.net.ddp2p.ASN1.*;
-import asn1objects.ASN1Project;
-import asn1objects.ASN1Task;
+import asn1objects.*;
 import datatypes.Project;
-import datatypes.Task;
 import net.ddp2p.ASN1.ASN1DecoderFail;
-import net.ddp2p.ASN1.ASNObj;
 import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
 
@@ -56,7 +53,7 @@ public class UDPHandler implements Runnable {
      */
     private int _port;
     private boolean _running = true;
-    private LogicEngine engine;
+    private ASN1LogicEngine engine;
 
     /**
      * Creates instance of UDP Handler, saves the port the handler listens to, and attempts to start a connection
@@ -67,7 +64,7 @@ public class UDPHandler implements Runnable {
      */
     public UDPHandler(int port, String dbFile) {
         _port = port;
-        engine = new LogicEngine(dbFile);
+        engine = new ASN1LogicEngine(dbFile);
     }
 
     /**
@@ -79,6 +76,7 @@ public class UDPHandler implements Runnable {
     @Override
     public synchronized void run() {
         try {
+
             DatagramSocket socket = new DatagramSocket(_port);
             DatagramPacket receive = new DatagramPacket(new byte[BUFFER_SIZE], BUFFER_SIZE);
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -97,13 +95,39 @@ public class UDPHandler implements Runnable {
                     // Interpret
 //                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
 //                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
-                    ASN1Project task = new ASN1Project();
-//                    Decoder dec = new Decoder(receive.getData());
-//                    dec.objectLen();
-                    Project t = task.decode(new Decoder(receive.getData()));
-                    ASN1Project response = new ASN1Project(t);
-                    Encoder asnresponse = response.getEncoder();
-                    byte[] reply = asnresponse.getBytes();
+
+                    Decoder decoder = new Decoder(receive.getData());
+                    String query;
+                    byte[] reply;
+
+                    switch(decoder.tagVal()) {
+                        case ASN1Task.TAGVALUE:
+                            query = task.decode(decoder).toString();
+                            System.out.println("Not a valid command");
+                            break;
+                        case ASN1Project.TAGVALUE:
+                            query = project.decode(decoder).toString();
+                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
+                            break;
+                        case ASN1ProjectOK.TAGVALUE:
+                            query = project.decode(decoder).toString();
+                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
+
+                            break;
+                        case ASN1Projects.TAGVALUE:
+                            query = project.decode(decoder).toString();
+                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
+
+                            break;
+                        case ASN1ProjectsAnswer.TAGVALUE:
+                            query = projectsAnswer.decode(decoder).toString();
+                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
+
+                            break;
+                        default:
+                            System.out.println("Unknown Command");
+                            break;
+                    }
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
@@ -118,6 +142,8 @@ public class UDPHandler implements Runnable {
 //                    System.out.println("Could not open database for UDP packet");
                 } catch (ASN1DecoderFail e) {
                     System.out.println("Could not parse message");
+                } catch (SQLException e) {
+                    System.out.println("Parsing failure");
                 }
             }
             socket.close();

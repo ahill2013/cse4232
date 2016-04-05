@@ -19,7 +19,9 @@ public class Project {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
+        sb.append("PROJECT_DEFINITION:");
         sb.append(name);
+        sb.append("TASKS:" + taskList.size() + ";");
         for (Task t : taskList) {
             sb.append(t.toString());
         }

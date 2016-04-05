@@ -12,6 +12,7 @@ import java.util.List;
  * Created by armin1215 on 3/31/16.
  */
 public class ASN1ProjectOK extends ASNObj {
+    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 3;
 
     List<Integer> _okays = new LinkedList<>();
     public ASN1ProjectOK() {}
@@ -25,7 +26,7 @@ public class ASN1ProjectOK extends ASNObj {
         for (Integer okay : _okays) {
             enc.addToSequence(new Encoder(okay).setASN1Type(Encoder.TAG_INTEGER));
         }
-        return enc.setASN1Type(Encoder.CLASS_UNIVERSAL,Encoder.PC_PRIMITIVE,Encoder.TAG_INTEGER);
+        return enc.setASN1Type(Encoder.CLASS_UNIVERSAL,Encoder.PC_PRIMITIVE,(byte) (Encoder.TAG_SEQUENCE + 3));
     }
 
     @Override

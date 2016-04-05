@@ -11,7 +11,7 @@ import java.util.List;
  * Created by armin1215 on 3/31/16.
  */
 public class ASN1Projects extends ASNObj {
-
+    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 4;
     public ASN1Projects() {}
 
     @Override
@@ -22,7 +22,7 @@ public class ASN1Projects extends ASNObj {
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
-        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, Encoder.TAG_SEQUENCE);
+        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) (Encoder.TAG_SEQUENCE + 4));
     }
 
     @Override

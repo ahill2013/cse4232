@@ -55,7 +55,7 @@ public class ASN1LogicEngine {
      * @return output response to parsing and executing commands
      * @throws SQLException if connection fails to close
      */
-    public synchronized String parseInput(final String input, final String IP, final int port) throws SQLException {
+    public synchronized byte[] parseInput(final String input, final String IP, final int port) throws SQLException {
 
 
         // Decoder decoder = new Decoder(input);
@@ -271,7 +271,7 @@ public class ASN1LogicEngine {
 
         output.append("\n");
         BackEnd.closeConnection(conn);
-        return output.toString();
+        return output.toString().getBytes();
     }
 
     /**

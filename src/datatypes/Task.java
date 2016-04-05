@@ -1,5 +1,7 @@
 package datatypes;
 
+import net.ddp2p.ASN1.ASNObj;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,6 +36,11 @@ public class Task {
         this.ip = ip;
         this.port = port;
         this.status = status;
+    }
+
+
+    public ASNObj queryDatabase() {
+
     }
 
 

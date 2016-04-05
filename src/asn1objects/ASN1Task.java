@@ -17,7 +17,7 @@ import java.util.Date;
  * Created by armin1215 on 3/31/16.
  */
 public class ASN1Task extends ASNObj {
-
+    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 1;
     private Task task;
     private SimpleDateFormat _sdf;
 
@@ -57,7 +57,7 @@ public class ASN1Task extends ASNObj {
         enc.addToSequence(new Encoder(task.getIP()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(task.getPort()).setASN1Type(Encoder.TAG_INTEGER));
         enc.addToSequence(new Encoder(task.getStatus()).setASN1Type(Encoder.TAG_BOOLEAN));
-        return enc.setASN1Type(Encoder.CLASS_APPLICATION,Encoder.PC_CONSTRUCTED,Encoder.TAG_SEQUENCE);
+        return enc.setASN1Type(Encoder.CLASS_APPLICATION,Encoder.PC_CONSTRUCTED,(byte) (Encoder.TAG_SEQUENCE + 1));
 
     }
 

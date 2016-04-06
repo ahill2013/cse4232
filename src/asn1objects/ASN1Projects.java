@@ -12,7 +12,15 @@ import java.util.List;
  */
 public class ASN1Projects extends ASNObj {
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 4;
-    public ASN1Projects() {}
+
+    private Projects projectNames;
+    public ASN1Projects() {
+        projectNames = new Projects();
+    }
+
+    public ASN1Projects(Projects pNames) {
+        projectNames = pNames;
+    }
 
     @Override
     public ASN1Projects instance() {
@@ -22,12 +30,23 @@ public class ASN1Projects extends ASNObj {
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
-        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) (Encoder.TAG_SEQUENCE + 4));
+
+        for (String projectName : projectNames.getProjectNames()) {
+            enc.addToSequence(new Encoder(projectName).setASN1Type(Encoder.TAG_UTF8String));
+        }
+
+        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
     @Override
     public Projects decode(Decoder dec) throws ASN1DecoderFail {
         Decoder decoder = dec.getContent();
-        return new Projects();
+
+        Projects pNames = new Projects();
+        while (!decoder.isEmptyContainer()) {
+            pNames.addProjectName(decoder.getFirstObject(true).getString(Encoder.TAG_UTF8String));
+        }
+
+        return pNames;
     }
 }

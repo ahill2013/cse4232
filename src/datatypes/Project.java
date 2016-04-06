@@ -10,6 +10,10 @@ public class Project {
     private String name;
     private List<Task> taskList;
 
+    public Project(String name) {
+        this.name = name;
+    }
+
     public Project(String name, List<Task> tasks) {
         this.name = name;
         this.taskList = tasks;
@@ -34,5 +38,8 @@ public class Project {
 
     public List<Task> getTasks() {
         return taskList;
+    }
+    public void addTask(Task t) {
+        taskList.add(t);
     }
 }

@@ -45,7 +45,7 @@ public class ASN1Project extends ASNObj {
         for (Task t : _project.getTasks()) {
             enc.addToSequence(new ASN1Task(t).getEncoder().setASN1Type(Encoder.TAG_SEQUENCE));
         }
-        return enc.setASN1Type(Encoder.CLASS_APPLICATION, Encoder.PC_CONSTRUCTED, (byte) (Encoder.TAG_SEQUENCE + 2));
+        return enc.setASN1Type(Encoder.CLASS_APPLICATION, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
     @Override

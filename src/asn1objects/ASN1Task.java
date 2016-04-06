@@ -57,7 +57,7 @@ public class ASN1Task extends ASNObj {
         enc.addToSequence(new Encoder(task.getIP()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(task.getPort()).setASN1Type(Encoder.TAG_INTEGER));
         enc.addToSequence(new Encoder(task.getStatus()).setASN1Type(Encoder.TAG_BOOLEAN));
-        return enc.setASN1Type(Encoder.CLASS_APPLICATION,Encoder.PC_CONSTRUCTED,(byte) (Encoder.TAG_SEQUENCE + 1));
+        return enc.setASN1Type(Encoder.CLASS_APPLICATION,Encoder.PC_CONSTRUCTED,(byte) TAGVALUE);
 
     }
 

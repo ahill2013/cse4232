@@ -99,6 +99,7 @@ public class BackEnd {
             }
             conn.commit();
         } catch (SQLException e) {
+            System.err.println("Failed to create project");
             e.printStackTrace();
             return false;
         }
@@ -111,18 +112,24 @@ public class BackEnd {
      * @return string of names. Returns "Failure" as first and only string in list if it fails to read from the database
      * This is weird but also surprisingly useful.
      */
-    public static LinkedList<String> getAllProjects(Connection conn) throws SQLException {
+    public static LinkedList<String> getAllProjects(Connection conn) {
         LinkedList<String> projects = new LinkedList<>();
-        Statement create = conn.createStatement();
-        ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
-        conn.commit();
 
-        while (resultSet.next()) {
-            projects.addLast(resultSet.getString("NAME"));
+        try {
+            Statement create = conn.createStatement();
+            ResultSet resultSet = create.executeQuery("SELECT * FROM " + PROJECTS);
+            conn.commit();
+
+            while (resultSet.next()) {
+                projects.addLast(resultSet.getString("NAME"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Could not retrieve all project names");
+            e.printStackTrace();
         }
 
         return projects;
-
     }
 
 

@@ -180,7 +180,7 @@ public class LogicEngine {
                     break;
                 case "GET_PROJECTS":
                     // Get all projects and append to output unless database is locked or does not exist. If locked print failure
-                    try {
+//                    try {
                         LinkedList<String> projects = BackEnd.getAllProjects(conn);
                         appendOutput(output, "OK");
                         appendOutput(output, "PROJECTS:" + projects.size());
@@ -191,9 +191,9 @@ public class LogicEngine {
                             }
                         }
                         index += 1;
-                    } catch (SQLException e) {
-                        _failure = true;
-                    }
+//                    } catch (SQLException e) {
+//                        _failure = true;
+//                    }
                     break;
                 case "GET_PROJECT":
                     // If there is not project name, break

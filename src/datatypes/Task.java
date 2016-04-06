@@ -39,11 +39,6 @@ public class Task {
     }
 
 
-    public ASNObj queryDatabase() {
-
-    }
-
-
     public String getName() {
         return name;
     }

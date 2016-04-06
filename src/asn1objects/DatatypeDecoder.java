@@ -3,7 +3,6 @@ package asn1objects;
 import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
-import net.ddp2p.ASN1.Encoder;
 import server.BackEnd;
 
 import java.sql.Connection;
@@ -11,7 +10,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by armin1215 on 4/5/16.
@@ -20,7 +18,7 @@ public class DatatypeDecoder {
 
     public static final int FAILURE = -1;
 
-    public static byte[] query(String _dbfile, SimpleDateFormat sdf, Decoder dec) throws ASN1DecoderFail, SQLException {
+    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec) throws ASN1DecoderFail, SQLException {
         Connection conn = BackEnd.openConnection(_dbfile);
         ProjectOK projectOK = new ProjectOK();
 
@@ -28,7 +26,7 @@ public class DatatypeDecoder {
 
         while (!dec.isEmptyContainer()) {
             int ok = 0;
-            switch(dec.tagVal()) {
+            switch (dec.tagVal()) {
                 case ASN1Project.TAGVALUE:
                     Project input = new ASN1Project().decode(dec.getFirstObject(true));
                     ok = queryProject(conn, sdf, input);
@@ -91,6 +89,12 @@ public class DatatypeDecoder {
         return new ASN1ProjectOK(okays).getEncoder().getBytes();
     }
 
+    private static String clientDecoder(Decoder dec) throws ASN1DecoderFail {
+
+
+
+
+    }
     private static int queryProject(Connection conn, SimpleDateFormat _sdf, Project p) {
         if (!BackEnd.createProject(conn, p.getName(), p.getTasks().size())) return FAILURE;
 

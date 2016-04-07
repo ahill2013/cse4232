@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 //import asn1.net.ddp2p.ASN1.*;
 import asn1objects.ASN1Project;
@@ -44,6 +45,60 @@ public class UDPClient {
     static int _port;
 
     public static void main (final String args[]) throws UnknownHostException, ParseException {
+
+        Scanner stdin = new Scanner(System.in);
+
+        System.out.println("Which command would you like to send?");
+        System.out.println("\t1. PROJECT_DEFINITION");
+        System.out.println("\t2. TAKE");
+        System.out.println("\t3. GET_PROJECTS");
+        System.out.println("\t4. GET_PROJECT");
+        System.out.println("\t5. EXIT");
+        System.out.print("Choose a number from the above list: ");
+        int input = stdin.nextInt();
+
+        while (input > 5 || input < 1) {
+            System.out.print("Invalid input. Enter a valid number (1-5): ");
+            input = stdin.nextInt();
+        }
+
+        System.out.println();
+
+        String command;
+        switch (input) {
+            case 1:
+                System.out.println("Finish the command");
+                System.out.print("PROJECT_DEFINITION:");
+                command = "PROJECT_DEFINITION:" + stdin.next();
+                //sendCommand(encodeProject(command));
+                break;
+            case 2:
+                System.out.println("Finish the command");
+                System.out.print("TAKE;");
+                command = "TAKE;" + stdin.next();
+                //sendCommand(encodeTake(command));
+                break;
+            case 3:
+                System.out.println("Sending command");
+                command = "GET_PROJECTS";
+                //sendCommand(encodeTake(command));
+                break;
+            case 4:
+                System.out.println("Finish the command");
+                System.out.print("GET_PROJECT;");
+                command = "GET_PROJECT;" + stdin.next();
+                //sendCommand(encodeProject(command));
+                break;
+            case 5:
+                System.out.println("Sending command");
+                command = "EXIT";
+                //sendCommand(encodeTake(command));
+                break;
+            default:
+                System.err.println("Invalid command");
+        }
+
+        /*
         SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
         _port = Integer.parseInt(args[0]);
 
@@ -70,57 +125,17 @@ public class UDPClient {
 //        ASN1Task test = new ASN1Task(t);
 //
 //        Encoder enc = test.getEncoder();
-            sendCommand(enc.getBytes());
-
-        // The script being run will set args[1] to either a 1 or 2
-//        if (args[1].equals("1")) {
-//            try {
-//                final String[] commandList = {
-//                        "GET_PROJECTS",
-//                        "PROJECT_DEFINITION:Exam2;TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z",
-//                        "TAKE;USER:Johny;PROJECT:Exam2;Buy paper",
-//                        "TAKE;USER:Mary;PROJECT:Exam2;Write exam",
-//                        "GET_PROJECTS",
-//                        "GET_PROJECT;Exam2",
-//                        "EXIT" };
-//
-//                for (String command : commandList) {
-//                    System.out.println(command);
-//                    System.out.println();
-//                    sendCommand(command);
-//                }
-//            } catch (UnknownHostException e) {
-//                e.printStackTrace();
-//            }
-//        } else if (args[1].equals("2")) {
-//            try {
-//                final String[] commandList = {
-//                        "PROJECT_DEFINITION:Exam;TASKS:2;Buy paper;2000-03-12:18h30m00s001Z;2000-03-15:18h30m00s001Z;Write exam;2020-03-15:18h30m00s001Z;2020-04-15:18h30m00s001Z",
-//                        "TAKE;USER:Johny;PROJECT:Exam;Buy paper",
-//                        "TAKE;USER:Mary;PROJECT:Exam;Write exam",
-//                        "GET_PROJECT;Exam",
-//                        "EXIT" };
-//
-//                for (String command : commandList) {
-//                    System.out.println(command);
-//                    System.out.println();
-//                    sendCommand(command);
-//                }
-//            } catch (UnknownHostException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        sendCommand(enc.getBytes());
+        */
     }
 
     private static void sendCommand(final byte[] input) throws UnknownHostException {
 
         DatagramSocket sock;
-        DatagramPacket data;
         try {
             byte[] buffer = new byte[4*1024];
             sock = new DatagramSocket();
             sock.send(new DatagramPacket(input, input.length, InetAddress.getByName("127.0.0.1"), _port));
-            data = new DatagramPacket(input, input.length, InetAddress.getByName("127.0.0.1"), _port);
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
             Project t = new ASN1Project().decode(new Decoder(buffer));

@@ -13,9 +13,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-/**
- * Created by armin1215 on 4/5/16.
- */
+
 public class DatatypeDecoder {
 
     public static final int FAILURE = -1;
@@ -37,7 +35,7 @@ public class DatatypeDecoder {
                     Project input = new ASN1Project().decode(dec.getFirstObject(true));
                     ok = queryProject(conn, sdf, input);
                     projectOK.addOkay(ok);
-                    response = new ASN1Project(input).getEncoder().getBytes());
+                    response = new ASN1Project(input).getEncoder().getBytes();
 
                     // Procedure for failure to get the project
                     if (ok != 0) {
@@ -49,7 +47,7 @@ public class DatatypeDecoder {
                 case ASN1Take.TAGVALUE:
                     Take tk = new ASN1Take().decode(dec.getFirstObject(true));
                     ok = queryTake(conn, tk);
-                    response = new ASN1Take(tk).getEncoder().getBytes());
+                    response = new ASN1Take(tk).getEncoder().getBytes();
 
                     if (ok != 0) {
                         System.out.print("Fail;");
@@ -134,7 +132,7 @@ public class DatatypeDecoder {
 
                     break;
                 case ASN1ProjectsAnswer.TAGVALUE:
-                    ProjectsAnswer pa = new ASN1ProjectsAnswer().decode(dec)
+                    ProjectsAnswer pa = new ASN1ProjectsAnswer().decode(dec);
                     sb.append(pa.toString() + "\n");
 
                     break;
@@ -143,6 +141,7 @@ public class DatatypeDecoder {
             }
         }
 
+        return sb.toString();
 
     }
     private static int queryProject(Connection conn, SimpleDateFormat _sdf, Project p) {

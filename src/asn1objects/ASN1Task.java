@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * Single task that is part of a project
  */
 public class ASN1Task extends ASNObj {
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 1;
@@ -39,13 +39,10 @@ public class ASN1Task extends ASNObj {
         task = t;
     }
 
-
-    @Override
-    public String toString() {
-        return task.toString();
-    }
-
-
+    /**
+     * Encodes task as a sequence of strings, dates, etc.
+     * @return encoded object
+     */
     @Override
     public Encoder getEncoder() {
         final String startTime = Encoder.getGeneralizedTime(task.getStartTime().getTime());
@@ -61,6 +58,12 @@ public class ASN1Task extends ASNObj {
 
     }
 
+    /**
+     * Decodes task into object
+     * @param decoder already created decoder
+     * @return decoded task
+     * @throws ASN1DecoderFail if byte array or stream is poor
+     */
     @Override
     public Task decode(Decoder decoder) throws ASN1DecoderFail {
         final Decoder dec = decoder.getContent();

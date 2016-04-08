@@ -8,7 +8,7 @@ import net.ddp2p.ASN1.Encoder;
 import java.util.List;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * List of projects in the database by name. Encoded and decoded here.
  */
 public class ASN1Projects extends ASNObj {
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 4;
@@ -22,11 +22,10 @@ public class ASN1Projects extends ASNObj {
         projectNames = pNames;
     }
 
-    @Override
-    public ASN1Projects instance() {
-        return new ASN1Projects();
-    }
-
+    /**
+     * Encodes list of projects (strings) as a sequence
+     * @return
+     */
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
@@ -38,6 +37,12 @@ public class ASN1Projects extends ASNObj {
         return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
+    /**
+     * Decodes asnprojects
+     * @param dec already created decoder
+     * @return list of project names in the database
+     * @throws ASN1DecoderFail if a bad byte array/stream is given to the decoder
+     */
     @Override
     public Projects decode(Decoder dec) throws ASN1DecoderFail {
         Decoder decoder = dec.getContent();

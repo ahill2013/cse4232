@@ -30,15 +30,17 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
 /**
- * Handles one client's interaction with the server by using the LogicEngine to open a
- * new connection to the database and continue parsing input from the client until the client ends the interaction
- * or the program is concluded.
+ * Handles one client's interaction with the server by using the ServerDecoder.serverQuery to connect to the database
+ * and continue parsing input from the client until the client ends the interaction.
  *
  * Uses Runnable with the methods run() and terminate()
  *
  * Started by normal method tcpHandlerInstance.start() and has a shutdown hook built in to force graceful termination.
  */
 public class TCPHandler implements Runnable {
+    /**
+     * Maximum size of individual messages sent and standard server greeting
+     */
     private static final int BUFFER_SIZE = 32768;
     private static String GREETING = "Hello User! You may now enter a command.\n\n";
     /**
@@ -47,6 +49,10 @@ public class TCPHandler implements Runnable {
      * _running is a flag set to false when the thread is asked to finish
      */
 
+    /**
+     * Date format that is expected from asn1 objects along with the location of the database and the already
+     * opened socket for use
+     */
     private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dddd:hh'h'mm'm'ss's'SSS'Z'");
     private String _dbfile;
     private Socket _sock;
@@ -79,6 +85,7 @@ public class TCPHandler implements Runnable {
 
             System.out.println("TCP Connection: " + IP);
 
+            // Byte streams that read and write output from socket
             InputStream reader = _sock.getInputStream();
             OutputStream writer = _sock.getOutputStream();
 
@@ -97,12 +104,15 @@ public class TCPHandler implements Runnable {
             // Read the input until the client closes the connection or until the server is closed
             while (_running) {
                 byte[] input = new byte[BUFFER_SIZE];
+
+                // Read in input, EOF means that there was an error reading input
                 int inputSize = reader.read(input);
 
                 if (inputSize == -1) {
                     break;
                 }
 
+                // Decode and reply
                 byte[] output = ServerDecoder.serverQuery(_dbfile, _sdf, new Decoder(input));
 
                 if (output.length > BUFFER_SIZE) {

@@ -6,7 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * Abstract version of ASN1Take. Part of projects and encoded in sequence inside
+ * a project.
  */
 public class Task {
     private String name;
@@ -18,6 +19,16 @@ public class Task {
 
     private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm's'ss's'SSS'Z'");
 
+    public Task(String name, Date start, Date end, String ip, int port, boolean status) {
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.ip = ip;
+        this.port = port;
+        this.status = status;
+    }
+
+
     public String toString() {
         final StringBuilder task = new StringBuilder();
         task.append(name + ";");
@@ -28,16 +39,6 @@ public class Task {
         task.append(status + ";");
         return task.toString();
     }
-
-    public Task(String name, Date start, Date end, String ip, int port, boolean status) {
-        this.name = name;
-        this.start = start;
-        this.end = end;
-        this.ip = ip;
-        this.port = port;
-        this.status = status;
-    }
-
 
     public String getName() {
         return name;

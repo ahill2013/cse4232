@@ -1,7 +1,9 @@
 package datatypes;
 
 /**
- * Created by armin1215 on 4/5/16.
+ * Command sent from client to set ownership of a task within a project
+ *
+ * Only encoded by clients and decoded by the server.
  */
 public class Take {
     private String _person;

@@ -10,14 +10,31 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
-
+/**
+ * Static class with one public method to deal with a single request from
+ * a UDP or TCP handler to the server.
+ *
+ * serverQuery is only public method and handles all of this
+ */
 public class ServerDecoder {
 
     public static final int FAILURE = -1;
 
+    /**
+     * Takes a database location, desired date format (not controlled by user)
+     * and a Decoder and then replies with a byte array containing the outcomes of
+     * each successfully decoded server query as a series of successes or failures.
+     * After the outcomes, comes either straightforward replies to the request or a
+     * reiteration of the request.
+     * @param _dbfile location of the database on the local system
+     * @param sdf format for dates entered into the database
+     * @param dec already created decoder
+     * @return response to all client requests
+     * @throws SQLException if the database is locked or the location of the data base does
+     * not exist
+     */
     public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec) throws SQLException {
 
         LinkedList<Integer> okays = new LinkedList<>();
@@ -118,41 +135,13 @@ public class ServerDecoder {
         return baf.toByteArray();
     }
 
-    public static String clientDecoder(Decoder dec) throws ASN1DecoderFail, SQLException {
-        StringBuilder sb = new StringBuilder();
-
-        ProjectOK pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
-
-        while (!dec.isEmptyContainer()) {
-            switch (dec.tagVal()) {
-                case ASN1Project.TAGVALUE:
-                    Project input = new ASN1Project().decode(dec.getFirstObject(true));
-                    sb.append(input.toString() + "\n");
-
-                    break;
-                case ASN1Take.TAGVALUE:
-                    Take tk = new ASN1Take().decode(dec.getFirstObject(true));
-                    sb.append(tk.toString() + "\n");
-
-                    break;
-                case ASN1Projects.TAGVALUE:
-                    Projects ps = new ASN1Projects().decode(dec.getFirstObject(true));
-                    sb.append(ps.toString() + "\n");
-
-                    break;
-                case ASN1ProjectsAnswer.TAGVALUE:
-                    ProjectsAnswer pa = new ASN1ProjectsAnswer().decode(dec);
-                    sb.append(pa.toString() + "\n");
-
-                    break;
-                default:
-                    throw new ASN1DecoderFail("Invalid ASN1 Tag Value");
-            }
-        }
-
-        return sb.toString();
-
-    }
+    /**
+     * Decodes a project
+     * @param conn opened connection to database
+     * @param _sdf date format to use
+     * @param p project to enter into database
+     * @return success or failure
+     */
     private static int queryProject(Connection conn, SimpleDateFormat _sdf, Project p) {
         if (!BackEnd.createProject(conn, p.getName(), p.getTasks().size())) return FAILURE;
 
@@ -163,14 +152,31 @@ public class ServerDecoder {
         return 0;
     }
 
+    /**
+     * Enters user into database for task
+     * @param conn opened connection to database
+     * @param take list of parameters provided to database for take
+     * @return success or failure
+     */
     private static int queryTake(Connection conn, Take take) {
         return BackEnd.setUser(conn, take.getProject(), take.getTask(), take.getPerson()) ? 0 : FAILURE;
     }
 
+    /**
+     * Gets list of projects to be encoded and sent back in response to get
+     * projects query
+     * @param conn opened connection to the database
+     * @return list of projects (failure if empty)
+     */
     private static Projects queryGetProjects(Connection conn) {
         return new Projects(BackEnd.getAllProjects(conn));
     }
 
+    /**
+     * Same as queryGetProjects except list returned is all of the projects created
+     * @param conn opened connection to database
+     * @return all projects in database in detail
+     */
     private static ProjectsAnswer queryGetProjectsUnabridged(Connection conn) {
         ProjectsAnswer pa = new ProjectsAnswer();
         for (String projectName : BackEnd.getAllProjects(conn)) {
@@ -179,7 +185,12 @@ public class ServerDecoder {
         return pa;
     }
 
-
+    /**
+     * Gets a project with its tasks from the database
+     * @param conn already opened connection to database
+     * @param projectName name of project to retrieve
+     * @return project with its tasks
+     */
     private static Project queryGetProject(Connection conn, String projectName) {
         Project p = new Project(projectName);
         for (String[] task : BackEnd.getTasks(conn, projectName)) {

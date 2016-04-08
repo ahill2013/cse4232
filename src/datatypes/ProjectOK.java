@@ -4,7 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by armin1215 on 4/5/16.
+ * Abstract version of ASN1ProjectOK. Contains list of the outcomes of the server's attempts
+ * to decode and interact with database for successfully decoded tasks.
+ *
+ * 0 is a successful reception. Anything else is a failure. Most failures are logic errors because
+ * the client's handle encoding messages.
  */
 public class ProjectOK {
     private List<Integer> _okays;

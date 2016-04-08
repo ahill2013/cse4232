@@ -1,7 +1,9 @@
 package datatypes;
 
 /**
- * Created by armin1215 on 4/5/16.
+ * Abstract version of ASN1GetProject
+ * Has the name of the requested project and a toString method for the client and server
+ * to use as stdout whenever one of these objects is received.
  */
 public class GetProject {
     private String _name;

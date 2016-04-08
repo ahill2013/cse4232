@@ -12,9 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * Produces encoders for projects and decodes ASN1Projects.
+ *
+ * Contains a Project object with all tasks
  */
 public class ASN1Project extends ASNObj {
+
+    //Unique tag value for object (for project's scope)
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 2;
     private Project _project;
 
@@ -33,21 +37,28 @@ public class ASN1Project extends ASNObj {
         _project = new Project(name, tasks);
     }
 
-    public String toString() {
-        return _project.toString();
-    }
-
+    /**
+     * Encodes project and tasks iteratively (entered in by constructor)
+     * @return encoded objects
+     */
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
         enc.addToSequence(new Encoder(_project.getName()).setASN1Type(Encoder.TAG_UTF8String));
 
+        // Iteratively encodes all Tasks into sequence
         for (Task t : _project.getTasks()) {
             enc.addToSequence(new ASN1Task(t).getEncoder().setASN1Type(Encoder.TAG_SEQUENCE));
         }
         return enc.setASN1Type(Encoder.CLASS_APPLICATION, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
+    /**
+     * Decodes a project
+     * @param dec already created decoder
+     * @return Project with all of its tasks
+     * @throws ASN1DecoderFail if a poor byte stream was given to the decoder
+     */
     @Override
     public Project decode(Decoder dec) throws ASN1DecoderFail {
 

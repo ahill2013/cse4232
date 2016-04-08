@@ -6,9 +6,12 @@ import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
 
 /**
- * Created by armin1215 on 4/6/16.
+ * Empty asn1 packet sent as request for list of projects
+ *
+ * Tag value is unique in project.
  */
 public class ASN1GetProjects extends ASNObj {
+    //Unique tag value for object (for project's scope)
     public static final int TAGVALUE = 8;
 
     @Override

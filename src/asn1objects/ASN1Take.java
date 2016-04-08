@@ -7,7 +7,7 @@ import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
 
 /**
- * Created by armin1215 on 4/5/16.
+ * Encoding object for a take command
  */
 public class ASN1Take extends ASNObj{
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 7;
@@ -17,6 +17,11 @@ public class ASN1Take extends ASNObj{
     public ASN1Take() {_take = new Take(" ", " ", " ");}
     public ASN1Take(Take take) {_take = take;}
 
+    /**
+     * Encodes take command with project, task, and name of user taking task
+     *
+     * @return encoded object
+     */
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
@@ -27,6 +32,12 @@ public class ASN1Take extends ASNObj{
         return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
+    /**
+     * Decoded Take command with specific data
+     * @param dec already created decoder
+     * @return take object
+     * @throws ASN1DecoderFail if byte array or stream is poor
+     */
     @Override
     public Take decode(Decoder dec) throws ASN1DecoderFail {
         Decoder decoder = dec.getContent();

@@ -24,6 +24,10 @@ public class ASN1ProjectOK extends ASNObj {
 
     public ASN1ProjectOK instance() {return new ASN1ProjectOK();}
 
+    /**
+     * Encodes list of integers designating status of server queries
+     * @return Encoded list of the outcomes received and the success status
+     */
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
@@ -33,6 +37,12 @@ public class ASN1ProjectOK extends ASNObj {
         return enc.setASN1Type(Encoder.CLASS_UNIVERSAL,Encoder.PC_PRIMITIVE,(byte) TAGVALUE);
     }
 
+    /**
+     * Decodes list and returns as project ok
+     * @param dec already created decoder
+     * @return list of query outcomes
+     * @throws ASN1DecoderFail if a bad byte array/stream is given to decoder
+     */
     @Override
     public ProjectOK decode(Decoder dec) throws ASN1DecoderFail {
         Decoder decoder = dec.getContent();

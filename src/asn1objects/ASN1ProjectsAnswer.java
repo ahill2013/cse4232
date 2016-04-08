@@ -11,7 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * List all of the projects and their respective tasks in the database.
+ *
+ * Basically a database dump.
  */
 public class ASN1ProjectsAnswer {
     public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 5;
@@ -30,6 +32,11 @@ public class ASN1ProjectsAnswer {
         return new ASN1ProjectsAnswer();
     }
 
+
+    /**
+     * Encode all of the projects as objects and send them
+     * @return encoded objects
+     */
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
 
@@ -39,6 +46,13 @@ public class ASN1ProjectsAnswer {
         return enc.setASN1Type(Encoder.CLASS_PRIVATE, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
+    /**
+     * Decode all of the projects and tasks in the database
+     *
+     * @param dec already created decoder with projectsanswer
+     * @return list of all projects and tasks in database
+     * @throws ASN1DecoderFail if byte array/stream entered is poor
+     */
     public ProjectsAnswer decode(Decoder dec) throws ASN1DecoderFail {
         List<Project> projects = new LinkedList<>();
         Decoder decoder = dec.getContent();

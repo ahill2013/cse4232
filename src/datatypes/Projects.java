@@ -4,10 +4,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by armin1215 on 3/31/16.
+ * List of abbreviated projects returned from the ASN1GetProjects command
+ *
+ * Empty if unsuccessful retrieval of projects occurs.
  */
 public class Projects {
     private List<String> _projectNames;
+
+    /**
+     * Constructors with obvious purposes
+     */
     public Projects() { _projectNames = new LinkedList<>(); }
     public Projects(List<String> projectNames) {
         _projectNames = projectNames;

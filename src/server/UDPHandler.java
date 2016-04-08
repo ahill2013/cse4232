@@ -27,6 +27,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 import asn1objects.*;
 import datatypes.Project;
@@ -51,9 +52,12 @@ public class UDPHandler implements Runnable {
      * _running is a flag to track whether program is being terminated
      * engine is an input parser inputs containing a connection instance for the database
      */
+
+    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
+
+    private String _dbfile;
     private int _port;
     private boolean _running = true;
-    private ASN1LogicEngine engine;
 
     /**
      * Creates instance of UDP Handler, saves the port the handler listens to, and attempts to start a connection
@@ -63,8 +67,8 @@ public class UDPHandler implements Runnable {
      * @param dbFile is the location of the already created database
      */
     public UDPHandler(int port, String dbFile) {
+        _dbfile = dbFile;
         _port = port;
-        engine = new ASN1LogicEngine(dbFile);
     }
 
     /**
@@ -98,7 +102,7 @@ public class UDPHandler implements Runnable {
 
                     Decoder decoder = new Decoder(receive.getData());
                     String query;
-                    byte[] reply = DatatypeDecoder(dbfile, sdf, decoder);
+                    byte[] reply = ServerDecoder.serverQuery(_dbfile, _sdf, decoder);
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);
@@ -106,22 +110,16 @@ public class UDPHandler implements Runnable {
                     // Reset the receive buffer for the next buffer (prevents overflow and over-read)
                     receive.setData(new byte[BUFFER_SIZE]);
 
-
                 } catch (IOException e) {
                     e.printStackTrace();
-//                } catch (SQLException e) {
-//                    System.out.println("Could not open database for UDP packet");
-                } catch (ASN1DecoderFail e) {
-                    System.out.println("Could not parse message");
                 } catch (SQLException e) {
-                    System.out.println("Parsing failure");
+                    System.err.println("Database Failure");
+                    e.printStackTrace();
                 }
             }
             socket.close();
         } catch (SocketException e) {
             e.printStackTrace();
-        } finally {
-            engine.closeLogicEngine();
         }
     }
 

@@ -98,36 +98,7 @@ public class UDPHandler implements Runnable {
 
                     Decoder decoder = new Decoder(receive.getData());
                     String query;
-                    byte[] reply;
-
-                    switch(decoder.tagVal()) {
-                        case ASN1Task.TAGVALUE:
-                            query = task.decode(decoder).toString();
-                            System.out.println("Not a valid command");
-                            break;
-                        case ASN1Project.TAGVALUE:
-                            query = project.decode(decoder).toString();
-                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
-                            break;
-                        case ASN1ProjectOK.TAGVALUE:
-                            query = project.decode(decoder).toString();
-                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
-
-                            break;
-                        case ASN1Projects.TAGVALUE:
-                            query = project.decode(decoder).toString();
-                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
-
-                            break;
-                        case ASN1ProjectsAnswer.TAGVALUE:
-                            query = projectsAnswer.decode(decoder).toString();
-                            reply = engine.parseInput(query, packet_address.toString(), packet_port);
-
-                            break;
-                        default:
-                            System.out.println("Unknown Command");
-                            break;
-                    }
+                    byte[] reply = DatatypeDecoder(dbfile, sdf, decoder);
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);

@@ -36,7 +36,7 @@ public class ClientParser {
         // Initialize commands structure and output string
         final String[] commands = input.split(";");
 
-        commands[commands.length - 1] = commands[commands.length - 1].replaceAll("\0", "");
+//        commands[commands.length - 1] = commands[commands.length - 1].replaceAll("\0", "");
         // if failure becomes true then loop ends and all input after index is printed
         // Loop until all commands in string are parsed
         int index = 0;
@@ -58,10 +58,11 @@ public class ClientParser {
                     final int numTasks;
 
                     String[] nums = commands[numIndex].split(":");
-                    numTasks = Integer.parseInt(commands[numIndex].split(":")[1]);
+                    numTasks = Integer.parseInt(nums[1]);
 
                     for (int i = 0; i < numTasks; i++) {
-                        p.addTask(new Task(commands[tasksIndex], sdf.parse(commands[tasksIndex + 1]), sdf.parse(commands[tasksIndex + 2]), " ", 0, false));
+                        Task t = new Task(commands[tasksIndex + 3 * NUMTASKCOMPONENTS], sdf.parse(commands[tasksIndex + NUMTASKCOMPONENTS * i + 1]), sdf.parse(commands[tasksIndex + NUMTASKCOMPONENTS * i + 2]), " ", 0, false);
+                        p.addTask(t);
                     }
 
                     index = tasksIndex + NUMTASKCOMPONENTS * numTasks;

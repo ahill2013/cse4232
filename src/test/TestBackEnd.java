@@ -50,7 +50,7 @@ public class TestBackEnd {
         System.out.println(be.getNumberTasks(conn, "Exam1"));
 
 
-        try {
+//        try {
             LinkedList<String> projects = BackEnd.getAllProjects(conn);
             for (String proj : projects) {
                 System.out.println(proj);
@@ -63,9 +63,10 @@ public class TestBackEnd {
                 }
                 System.out.println();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        }
+//        catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         try {
             BackEnd.closeConnection(conn);

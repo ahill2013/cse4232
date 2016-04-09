@@ -90,8 +90,8 @@ public class TCPHandler implements Runnable {
             OutputStream writer = _sock.getOutputStream();
 
             // Greet User upon connection to server
-            writer.write(GREETING.getBytes());
-            writer.flush();
+//            writer.write(GREETING.getBytes());
+//            writer.flush();
 
             // Force graceful shutdown
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -106,6 +106,7 @@ public class TCPHandler implements Runnable {
                 byte[] input = new byte[BUFFER_SIZE];
 
                 // Read in input, EOF means that there was an error reading input
+
                 int inputSize = reader.read(input);
 
                 if (inputSize == -1) {

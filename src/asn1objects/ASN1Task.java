@@ -17,7 +17,7 @@ import java.util.Date;
  * Single task that is part of a project
  */
 public class ASN1Task extends ASNObj {
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 1;
+    public static final int TAGVALUE = 1;
     private Task task;
     private SimpleDateFormat _sdf;
 

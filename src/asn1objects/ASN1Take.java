@@ -10,7 +10,7 @@ import net.ddp2p.ASN1.Encoder;
  * Encoding object for a take command
  */
 public class ASN1Take extends ASNObj{
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 7;
+    public static final int TAGVALUE = 7;
 
     private Take _take;
 

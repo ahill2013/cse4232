@@ -19,7 +19,7 @@ import java.util.List;
 public class ASN1Project extends ASNObj {
 
     //Unique tag value for object (for project's scope)
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 2;
+    public static final int TAGVALUE = 2;
     private Project _project;
 
     @Override
@@ -48,7 +48,7 @@ public class ASN1Project extends ASNObj {
 
         // Iteratively encodes all Tasks into sequence
         for (Task t : _project.getTasks()) {
-            enc.addToSequence(new ASN1Task(t).getEncoder().setASN1Type(Encoder.TAG_SEQUENCE));
+            enc.addToSequence(new ASN1Task(t).getEncoder().setASN1Type((byte) ASN1Task.TAGVALUE));
         }
         return enc.setASN1Type(Encoder.CLASS_APPLICATION, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }

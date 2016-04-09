@@ -16,7 +16,7 @@ import java.util.List;
  * Basically a database dump.
  */
 public class ASN1ProjectsAnswer {
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 5;
+    public static final int TAGVALUE = 5;
 
     private ProjectsAnswer _projectAns;
 

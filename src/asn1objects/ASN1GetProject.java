@@ -14,7 +14,7 @@ import net.ddp2p.ASN1.Encoder;
  */
 public class ASN1GetProject extends ASNObj {
     //Unique tag value for object (for project's scope)
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 6;
+    public static final int TAGVALUE = 6;
     private GetProject _getProject;
 
     public ASN1GetProject() {}

@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ASN1ProjectOK extends ASNObj {
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 3;
+    public static final int TAGVALUE = 3;
 
     ProjectOK projectOK;
     public ASN1ProjectOK() { projectOK = new ProjectOK(); }

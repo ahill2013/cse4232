@@ -61,11 +61,12 @@ public class ClientParser {
                     numTasks = Integer.parseInt(nums[1]);
 
                     for (int i = 0; i < numTasks; i++) {
-                        Task t = new Task(commands[tasksIndex + 3 * NUMTASKCOMPONENTS], sdf.parse(commands[tasksIndex + NUMTASKCOMPONENTS * i + 1]), sdf.parse(commands[tasksIndex + NUMTASKCOMPONENTS * i + 2]), " ", 0, false);
+                        Task t = new Task(commands[tasksIndex], sdf.parse(commands[tasksIndex + 1]), sdf.parse(commands[tasksIndex + 2]), " ", 0, false);
                         p.addTask(t);
+                        tasksIndex += 3;
                     }
 
-                    index = tasksIndex + NUMTASKCOMPONENTS * numTasks;
+                    index = tasksIndex;
                     byte[] encodedProject = new ASN1Project(p).getEncoder().getBytes();
                     serverCommands.add(encodedProject);
                     serverCommandBytes += encodedProject.length;

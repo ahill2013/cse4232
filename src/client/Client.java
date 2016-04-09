@@ -89,13 +89,15 @@ public class Client {
 
     }
 
-    private static void sendCommandUDP(final byte[] input, final String IP, final int port) throws UnknownHostException {
+    private static void sendCommandUDP(final byte[] input, String IP, int port) throws UnknownHostException {
 
+        final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
         DatagramSocket sock;
         try {
             byte[] buffer = new byte[4*1024];
             sock = new DatagramSocket();
-            sock.send(new DatagramPacket(input, input.length, InetAddress.getByName(IP), _port));
+            DatagramPacket send = new DatagramPacket(input, input.length, inetAddress, _port);
+            sock.send(send);
 
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
@@ -104,6 +106,7 @@ public class Client {
             System.out.println("Could not connect to remote host");
         } catch (IOException e) {
             System.out.println("Network error");
+            e.printStackTrace();
         } catch (ASN1DecoderFail e) {
             System.out.println("Could not decode asn1");
         }
@@ -139,6 +142,7 @@ public class Client {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 
             writer.write(input.toString());
+            writer.flush();
             ASNresponse = reader.readLine().getBytes();
             response = new ASN1Project().decode(new Decoder(ASNresponse));
 

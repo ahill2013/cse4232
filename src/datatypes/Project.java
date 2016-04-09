@@ -1,5 +1,6 @@
 package datatypes;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public class Project {
      */
     public Project(String name) {
         this.name = name;
+        this.taskList = new LinkedList<>();
     }
 
     /**

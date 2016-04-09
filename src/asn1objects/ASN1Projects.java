@@ -11,7 +11,7 @@ import java.util.List;
  * List of projects in the database by name. Encoded and decoded here.
  */
 public class ASN1Projects extends ASNObj {
-    public static final int TAGVALUE = Encoder.TAG_SEQUENCE + 4;
+    public static final int TAGVALUE = 4;
 
     private Projects projectNames;
     public ASN1Projects() {

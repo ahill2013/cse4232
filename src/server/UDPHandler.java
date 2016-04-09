@@ -29,11 +29,7 @@ import java.net.SocketException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
-import asn1objects.*;
-import datatypes.Project;
-import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
-import net.ddp2p.ASN1.Encoder;
 
 /**
  * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of

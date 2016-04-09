@@ -1,5 +1,6 @@
-package asn1objects;
+package server;
 
+import asn1objects.*;
 import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;

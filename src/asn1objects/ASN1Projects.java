@@ -51,7 +51,6 @@ public class ASN1Projects extends ASNObj {
         while (!decoder.isEmptyContainer()) {
             pNames.addProjectName(decoder.getFirstObject(true).getString(Encoder.TAG_UTF8String));
         }
-
         return pNames;
     }
 }

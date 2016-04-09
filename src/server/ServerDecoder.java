@@ -47,7 +47,7 @@ public class ServerDecoder {
             conn = BackEnd.openConnection(_dbfile);
             ProjectOK projectOK = new ProjectOK();
 
-            while (dec.lenLen() != 0) {
+            while (!dec.isEmptyContainer()) {
                 System.out.println(dec.objectLen());
                 int ok = 0;
                 byte[] response;

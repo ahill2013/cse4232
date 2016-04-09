@@ -39,6 +39,7 @@ public class Client {
 
     public static void main (final String args[]) throws UnknownHostException, ParseException {
 
+        // TODO add better argument handling
         String IP = args[0];
         int port = Integer.parseInt(args[1]);
         String flag = "-t";  // use tcp by default

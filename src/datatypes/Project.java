@@ -40,7 +40,7 @@ public class Project {
 
         sb.append("PROJECT_DEFINITION:");
         sb.append(name);
-        sb.append("TASKS:" + taskList.size() + ";");
+        sb.append(";TASKS:" + taskList.size() + ";");
         for (Task t : taskList) {
             sb.append(t.toString());
         }
@@ -56,5 +56,17 @@ public class Project {
     }
     public void addTask(Task t) {
         taskList.add(t);
+    }
+
+    public void addPort(int port) {
+        for (Task task : taskList) {
+            task.setPort(port);
+        }
+    }
+
+    public void addIP(String IP) {
+        for (Task task : taskList) {
+            task.setIP(IP);
+        }
     }
 }

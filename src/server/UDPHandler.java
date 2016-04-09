@@ -88,6 +88,7 @@ public class UDPHandler implements Runnable {
 
             while (_running) {
                 try {
+                    socket.getReceiveBufferSize();
                     // Receive
                     socket.receive(receive);
                     InetAddress packet_address = receive.getAddress();
@@ -96,9 +97,9 @@ public class UDPHandler implements Runnable {
 //                    byte[] reply = engine.parseInput(new String(receive.getData()).replaceAll("\n", "").replaceAll("\0", ""),
 //                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
 
-                    Decoder decoder = new Decoder(receive.getData());
+                    Decoder decoder = new Decoder(receive.getData(), 0, receive.getLength());
                     String query;
-                    byte[] reply = ServerDecoder.serverQuery(_dbfile, _sdf, decoder);
+                    byte[] reply = ServerDecoder.serverQuery(_dbfile, _sdf, decoder, packet_address.toString().substring(packet_address.toString().indexOf('/') + 1), packet_port);
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);

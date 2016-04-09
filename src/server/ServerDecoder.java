@@ -36,7 +36,7 @@ public class ServerDecoder {
      * @throws SQLException if the database is locked or the location of the data base does
      * not exist
      */
-    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec) throws SQLException {
+    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, String ipAddress, int port) throws SQLException {
 
         LinkedList<Integer> okays = new LinkedList<>();
 
@@ -47,12 +47,15 @@ public class ServerDecoder {
             conn = BackEnd.openConnection(_dbfile);
             ProjectOK projectOK = new ProjectOK();
 
-            while (!dec.isEmptyContainer()) {
+            while (dec.lenLen() != 0) {
+                System.out.println(dec.objectLen());
                 int ok = 0;
                 byte[] response;
                 switch (dec.tagVal()) {
                     case ASN1Project.TAGVALUE:
                         Project input = new ASN1Project().decode(dec.getFirstObject(true));
+                        input.addPort(port);
+                        input.addIP(ipAddress);
                         ok = queryProject(conn, sdf, input);
                         projectOK.addOkay(ok);
                         response = new ASN1Project(input).getEncoder().getBytes();

@@ -113,7 +113,7 @@ public class TCPHandler implements Runnable {
                 }
 
                 // Decode and reply
-                byte[] output = ServerDecoder.serverQuery(_dbfile, _sdf, new Decoder(input));
+                byte[] output = ServerDecoder.serverQuery(_dbfile, _sdf, new Decoder(input, 0, inputSize), IP, clientPort);
 
                 if (output.length > BUFFER_SIZE) {
                     break;

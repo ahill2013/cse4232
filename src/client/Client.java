@@ -89,9 +89,9 @@ public class Client {
 
     }
 
-    private static void sendCommandUDP(final byte[] input, String IP, int port) throws UnknownHostException {
+    private static void sendCommandUDP(final byte[] input, String IP, int _port) throws UnknownHostException {
 
-        final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
+        final InetAddress inetAddress = InetAddress.getByName(IP);
         DatagramSocket sock;
         try {
             byte[] buffer = new byte[4*1024];

@@ -17,7 +17,7 @@ public class Task {
     private int port;
     private boolean status;
 
-    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm's'ss's'SSS'Z'");
+    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
 
     public Task(String name, Date start, Date end, String ip, int port, boolean status) {
         this.name = name;
@@ -26,6 +26,14 @@ public class Task {
         this.ip = ip;
         this.port = port;
         this.status = status;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setIP(String IP) {
+        this.ip = IP;
     }
 
 

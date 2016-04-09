@@ -79,6 +79,7 @@ public class ServerDecoder {
 
                         break;
                     case ASN1GetProjects.TAGVALUE:
+                        String check = new ASN1GetProjects().decode(dec.getFirstObject(true));
                         Projects ps = queryGetProjects(conn);
                         response = new ASN1Projects(ps).getEncoder().getBytes();
 

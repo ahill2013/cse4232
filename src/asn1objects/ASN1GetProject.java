@@ -31,7 +31,7 @@ public class ASN1GetProject extends ASNObj {
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
         enc.addToSequence(new Encoder(_getProject.getName()).setASN1Type(Encoder.TAG_UTF8String));
-        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
+        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_PRIMITIVE, (byte) TAGVALUE);
     }
 
     /**

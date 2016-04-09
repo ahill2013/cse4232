@@ -9,6 +9,7 @@ import server.BackEnd;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -36,7 +37,7 @@ public class ServerDecoder {
      * @throws SQLException if the database is locked or the location of the data base does
      * not exist
      */
-    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, String ipAddress, int port) throws SQLException {
+    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, String ipAddress, int port) throws SQLException, ParseException {
 
         LinkedList<Integer> okays = new LinkedList<>();
 
@@ -48,7 +49,6 @@ public class ServerDecoder {
             ProjectOK projectOK = new ProjectOK();
 
             while (!dec.isEmptyContainer()) {
-                System.out.println(dec.objectLen());
                 int ok = 0;
                 byte[] response;
                 switch (dec.tagVal()) {
@@ -90,7 +90,7 @@ public class ServerDecoder {
 
                         break;
                     case ASN1GetProjectsUnabridged.TAGVALUE:
-                        ProjectsAnswer pa = queryGetProjectsUnabridged(conn);
+                        ProjectsAnswer pa = queryGetProjectsUnabridged(conn, sdf);
                         response = new ASN1ProjectsAnswer(pa).getEncoder().getBytes();
 
                         if (pa.getProjects().isEmpty()) {
@@ -102,7 +102,7 @@ public class ServerDecoder {
                         break;
                     case ASN1GetProject.TAGVALUE:
                         GetProject gp = new ASN1GetProject().decode(dec.getFirstObject(true));
-                        Project output = queryGetProject(conn, gp.getName());
+                        Project output = queryGetProject(conn, sdf, gp.getName());
                         response = new ASN1Project(output).getEncoder().getBytes();
 
                         if (output.getTasks().isEmpty()) {
@@ -110,7 +110,7 @@ public class ServerDecoder {
                             ok = FAILURE;
                         }
                         System.out.println(gp);
-
+                        System.out.println(output);
                         break;
                     default:
                         throw new ASN1DecoderFail("Invalid ASN1 Tag Value");
@@ -184,10 +184,10 @@ public class ServerDecoder {
      * @param conn opened connection to database
      * @return all projects in database in detail
      */
-    private static ProjectsAnswer queryGetProjectsUnabridged(Connection conn) {
+    private static ProjectsAnswer queryGetProjectsUnabridged(Connection conn, SimpleDateFormat sdf) throws ParseException {
         ProjectsAnswer pa = new ProjectsAnswer();
         for (String projectName : BackEnd.getAllProjects(conn)) {
-            pa.addProject(queryGetProject(conn, projectName));
+            pa.addProject(queryGetProject(conn, sdf, projectName));
         }
         return pa;
     }
@@ -198,10 +198,17 @@ public class ServerDecoder {
      * @param projectName name of project to retrieve
      * @return project with its tasks
      */
-    private static Project queryGetProject(Connection conn, String projectName) {
+    private static Project queryGetProject(Connection conn, SimpleDateFormat sdf, String projectName) throws ParseException {
         Project p = new Project(projectName);
         for (String[] task : BackEnd.getTasks(conn, projectName)) {
-            p.addTask(new Task(task[0], new Date(task[1]), new Date(task[2]), task[3], Integer.parseInt(task[4]), Boolean.parseBoolean(task[5])));
+            String taskName = task[0];
+            Date start = sdf.parse(task[1]);
+            Date end = sdf.parse(task[2]);
+            String ip = task[3];
+            int port = Integer.parseInt(task[4]);
+            boolean status = Boolean.parseBoolean(task[5]);
+            Task t = new Task(taskName, start, end, ip, port, status);
+            p.addTask(t);
         }
         return p;
     }

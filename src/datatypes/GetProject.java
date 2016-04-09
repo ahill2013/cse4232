@@ -15,7 +15,7 @@ public class GetProject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        return sb.append("GET_PROJECTS;" + _name).toString();
+        return sb.append("GET_PROJECT;" + _name).toString();
     }
 
     public String getName() {

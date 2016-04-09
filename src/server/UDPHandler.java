@@ -27,6 +27,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import net.ddp2p.ASN1.Decoder;
@@ -107,7 +108,9 @@ public class UDPHandler implements Runnable {
                     // Reset the receive buffer for the next buffer (prevents overflow and over-read)
                     receive.setData(new byte[BUFFER_SIZE]);
 
-                } catch (IOException e) {
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }catch (IOException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
                     System.err.println("Database Failure");

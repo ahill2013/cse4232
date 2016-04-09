@@ -26,6 +26,7 @@ import net.ddp2p.ASN1.Decoder;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -127,6 +128,8 @@ public class TCPHandler implements Runnable {
             System.err.println("File not found for the database");
             e.printStackTrace();
             System.exit(-1);
+        } catch (ParseException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SQLException e) {

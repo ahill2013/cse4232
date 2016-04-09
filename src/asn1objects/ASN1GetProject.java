@@ -31,7 +31,7 @@ public class ASN1GetProject extends ASNObj {
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
         enc.addToSequence(new Encoder(_getProject.getName()).setASN1Type(Encoder.TAG_UTF8String));
-        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_PRIMITIVE, (byte) TAGVALUE);
+        return enc.setASN1Type(Encoder.CLASS_CONTEXT, Encoder.PC_CONSTRUCTED, (byte) TAGVALUE);
     }
 
     /**
@@ -43,9 +43,8 @@ public class ASN1GetProject extends ASNObj {
      */
     @Override
     public GetProject decode(Decoder dec) throws ASN1DecoderFail {
-        Decoder decoder = dec;
-        dec.getContent();
-        String projectName = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
+        Decoder decoder = dec.getContent();
+        String projectName = decoder.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         return new GetProject(projectName);
     }
 }

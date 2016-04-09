@@ -24,6 +24,7 @@ package client;
 import java.io.*;
 import java.net.*;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 //import asn1.net.ddp2p.ASN1.*;
@@ -32,12 +33,15 @@ import asn1objects.ASN1Project;
 import datatypes.Project;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
+import net.ddp2p.ASN1.Encoder;
 
 public class Client {
-
+    static int BUFFER = 32500;
     static int _port;
+    private boolean _running = false;
 
-    public static void main (final String args[]) throws UnknownHostException, ParseException {
+
+    public static synchronized void main (final String args[]) throws UnknownHostException, ParseException {
 
         // TODO add better argument handling
         String IP = args[0];
@@ -46,95 +50,43 @@ public class Client {
         flag = args[2];
 
         Scanner stdin = new Scanner(System.in);
+//        Thread t = null;
+//        if (flag.equals("-u")) {
+//            t = new Thread
+//
+//        }
+        while (true) {
 
-        for (;;) {
-            System.out.println("Which command would you like to send?");
-            System.out.println("\t1. PROJECT_DEFINITION");
-            System.out.println("\t2. TAKE");
-            System.out.println("\t3. GET_PROJECTS");
-            System.out.println("\t4. GET_PROJECT");
-            System.out.println("\t5. EXIT");
-            System.out.print("Choose a number from the above list: ");
-            int input = stdin.nextInt();
 
-            while (input > 5 || input < 1) {
-                System.out.print("Invalid input. Enter a valid number (1-5): ");
-                input = stdin.nextInt();
+            String input = stdin.nextLine();
+
+            // Get out of program
+            if (input.equals("EXIT")) {
+                break;
+            }
+
+
+            byte[] serverInput;
+            try {
+                serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'"));
+
+                if (flag.equals("-t")) {
+                    sendCommandTCP(serverInput, IP, port);
+                } else if (flag.equals("-u")) {
+                    sendCommandUDP(serverInput, IP, port);
+                }
+
+            } catch (Exception e) {
+                System.out.println("Poor Command entered");
+                System.out.println(e.getMessage());
+                continue;
             }
 
             System.out.println();
 
-            String command;
-            switch (input) {
-                case 1:
-                    System.out.println("Finish the command");
-                    System.out.print("PROJECT_DEFINITION:");
-                    command = "PROJECT_DEFINITION:" + stdin.next();
-                    //sendCommandUDP(encodeProject(command));
-                    break;
-                case 2:
-                    System.out.println("Finish the command");
-                    System.out.print("TAKE;");
-                    command = "TAKE;" + stdin.next();
-                    //sendCommandUDP(encodeTake(command));
-                    break;
-                case 3:
-                    System.out.println("Sending command");
-                    command = "GET_PROJECTS";
-                    //sendCommandUDP(encodeTake(command));
-                    break;
-                case 4:
-                    System.out.println("Finish the command");
-                    System.out.print("GET_PROJECT;");
-                    command = "GET_PROJECT;" + stdin.next();
-                    //sendCommandUDP(encodeProject(command));
-                    break;
-                case 5:
-                    System.out.println("Sending command");
-                    command = "EXIT";
-                    //sendCommandUDP(encodeTake(command));
-                    break;
-                default:
-                    System.err.println("Invalid command");
-                    command = null;
-            }
-
-            if (flag.equals("-t")) {
-                sendCommandTCP(command.getBytes(), IP, port);
-            } else if (flag.equals("-u")) {
-                sendCommandUDP(command.getBytes(), IP, port);
-            }
         }
 
-        /*
-        SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
-        _port = Integer.parseInt(args[0]);
 
-        Task t, t1;
-        List<Task> tasks = new LinkedList<Task>();
-
-        t = new Task("TEST", _sdf.parse("1980-01-01:01h01m01s001Z"), _sdf.parse("1980-01-01:01h01m01s001Z"), "localhost", 2235, false);
-        t1 = new Task("test", _sdf.parse("1980-01-01:01h01m01s001Z"), _sdf.parse("1980-01-01:01h01m01s001Z"), "localhost", 2235, false);
-        tasks.add(t);
-        tasks.add(t1);
-
-
-        Project p = new Project("Test", tasks);
-        Encoder enc = new ASN1Project(p).getEncoder();
-        Encoder encTask = new ASN1Project(p).getEncoder();
-
-        Decoder decTask = new Decoder(encTask.getBytes());
-        Decoder dec = new Decoder(enc.getBytes());
-
-        System.out.println(dec.getTypeByte());
-        System.out.println(decTask.getTypeByte());
-
-
-//        ASN1Task test = new ASN1Task(t);
-//
-//        Encoder enc = test.getEncoder();
-        sendCommandUDP(enc.getBytes());
-        */
     }
 
     private static void sendCommandUDP(final byte[] input, final String IP, final int port) throws UnknownHostException {
@@ -144,11 +96,30 @@ public class Client {
             byte[] buffer = new byte[4*1024];
             sock = new DatagramSocket();
             sock.send(new DatagramPacket(input, input.length, InetAddress.getByName(IP), _port));
+
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
-            Project response = new ASN1Project().decode(new Decoder(buffer));
+            ClientParser.printClientOutput(new Decoder(receipt.getData()));
+        } catch (SocketException e) {
+            System.out.println("Could not connect to remote host");
+        } catch (IOException e) {
+            System.out.println("Network error");
+        } catch (ASN1DecoderFail e) {
+            System.out.println("Could not decode asn1");
+        }
+    }
 
-            System.out.println(response.toString());
+    private static void receiveUDP() throws UnknownHostException {
+        DatagramSocket sock;
+        byte[] buffer = new byte[BUFFER];
+        try {
+            sock = new DatagramSocket();
+
+            while (true) {
+                DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
+                sock.receive(receipt);
+                ClientParser.printClientOutput(new Decoder(receipt.getData()));
+            }
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -158,7 +129,7 @@ public class Client {
         }
     }
 
-    private static String sendCommandTCP(final byte[] input, final String IP, final int port) {
+    private static synchronized String sendCommandTCP(final byte[] input, final String IP, final int port) {
 
         byte[] ASNresponse = null;
         Project response = null;
@@ -218,7 +189,7 @@ public class Client {
      *
      * @throws UnknownHostException if the specified inetAddress cannot be found on the machine
      */
-    private static void sendExitUDP() throws UnknownHostException {
+    private void sendExitUDP() throws UnknownHostException {
         final byte[] command = ("EXIT").getBytes();
 
         final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");

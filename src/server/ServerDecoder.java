@@ -112,6 +112,12 @@ public class ServerDecoder {
                     default:
                         throw new ASN1DecoderFail("Invalid ASN1 Tag Value");
                 }
+
+                if (ok == 0) {
+                    byte[] okay = new ASN1ProjectOK(0).getEncoder().getBytes();
+                    responses.add(okay);
+                    numBytes += okay.length;
+                }
                 numBytes += response.length;
                 responses.add(response);
                 okays.add(ok);
@@ -123,9 +129,6 @@ public class ServerDecoder {
         } finally {
             BackEnd.closeConnection(conn);
         }
-
-        byte[] evaluation = new ASN1ProjectOK(okays).getEncoder().getBytes();
-        numBytes += evaluation.length;
 
         ByteArrayBuffer baf = new ByteArrayBuffer(numBytes);
 

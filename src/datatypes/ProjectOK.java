@@ -11,18 +11,18 @@ import java.util.List;
  * the client's handle encoding messages.
  */
 public class ProjectOK {
-    private List<Integer> _okays;
+    private int _okays;
 
-    public ProjectOK() { _okays = new LinkedList<>(); }
-    public ProjectOK(List<Integer> okays) {
+    public ProjectOK() { _okays = -1; }
+    public ProjectOK(int okays) {
         _okays = okays;
     }
 
     public void addOkay(int okay) {
-        _okays.add(okay);
+        _okays = okay;
     }
 
-    public List<Integer> getOkays() {
+    public int getOkays() {
         return _okays;
     }
 

@@ -115,51 +115,32 @@ public class ClientParser {
 
 
     public static synchronized void printClientOutput(final Decoder dec) throws ASN1DecoderFail {
-        ProjectOK pOK;
         StringBuilder sb = new StringBuilder();
 
-        if (!dec.isEmptyContainer()) {
-            pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
-        } else {
-            throw new ASN1DecoderFail("No okays returned");
-        }
 
-        Iterator pOKIter = pOK.getOkays().iterator();
         while(!dec.isEmptyContainer()) {
+
+            ProjectOK pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
+            if (pOK.getOkays() == 0) {
+                sb.append("OK;");
+            } else {
+                sb.append("FAIL;");
+            }
+
             switch(dec.tagVal()) {
                 case ASN1Project.TAGVALUE:
-                    if (pOKIter.next() == 0) {
-                        sb.append("OK;");
-                    } else {
-                        sb.append("FAIL;");
-                    }
-
                     sb.append(new ASN1Project().decode(dec.getFirstObject(true)).toString());
                     break;
                 case ASN1Projects.TAGVALUE:
-                    if (pOKIter.next() == 0) {
-                        sb.append("OK;");
-                    } else {
-                        sb.append("FAIL;");
-                    }
-
                     sb.append(new ASN1Projects().decode(dec.getFirstObject(true)).toString());
                     break;
                 case ASN1Take.TAGVALUE:
-                    if (pOKIter.next() == 0) {
-                        sb.append("OK;");
-                    } else {
-                        sb.append("FAIL;");
-                    }
-
                     sb.append(new ASN1Take().decode(dec.getFirstObject(true)).toString());
                     break;
                 default:
                     throw new ASN1DecoderFail("Unrecognized asn1 object");
             }
         }
-
-
 
     }
 

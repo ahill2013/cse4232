@@ -89,9 +89,9 @@ public class Client {
 
     }
 
-    private static void sendCommandUDP(final byte[] input, String IP, int port) throws UnknownHostException {
+    private static void sendCommandUDP(final byte[] input, String IP, int _port) throws UnknownHostException {
 
-        final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
+        final InetAddress inetAddress = InetAddress.getByName(IP);
         DatagramSocket sock;
         try {
             byte[] buffer = new byte[4*1024];
@@ -101,7 +101,9 @@ public class Client {
 
             DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
             sock.receive(receipt);
-            ClientParser.printClientOutput(new Decoder(receipt.getData()));
+
+            Decoder rec = new Decoder(receipt.getData(), 0, receipt.getLength());
+            ClientParser.printClientOutput(rec);
         } catch (SocketException e) {
             System.out.println("Could not connect to remote host");
         } catch (IOException e) {

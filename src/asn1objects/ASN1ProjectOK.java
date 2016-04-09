@@ -18,7 +18,7 @@ public class ASN1ProjectOK extends ASNObj {
 
     ProjectOK projectOK;
     public ASN1ProjectOK() { projectOK = new ProjectOK(); }
-    public ASN1ProjectOK(List<Integer> okays) {
+    public ASN1ProjectOK(int okays) {
         projectOK = new ProjectOK(okays);
     }
 
@@ -31,9 +31,7 @@ public class ASN1ProjectOK extends ASNObj {
     @Override
     public Encoder getEncoder() {
         Encoder enc = new Encoder().initSequence();
-        for (Integer okay : projectOK.getOkays()) {
-            enc.addToSequence(new Encoder(okay).setASN1Type(Encoder.TAG_INTEGER));
-        }
+        enc.addToSequence(new Encoder(projectOK.getOkays()).setASN1Type(Encoder.TAG_INTEGER));
         return enc.setASN1Type(Encoder.CLASS_UNIVERSAL,Encoder.PC_PRIMITIVE,(byte) TAGVALUE);
     }
 
@@ -46,10 +44,7 @@ public class ASN1ProjectOK extends ASNObj {
     @Override
     public ProjectOK decode(Decoder dec) throws ASN1DecoderFail {
         Decoder decoder = dec.getContent();
-        List<Integer> okays = new LinkedList<>();
-        while(!decoder.isEmptyContainer()) {
-            okays.add(decoder.getFirstObject(true).getInteger().intValue());
-        }
-        return new ProjectOK(okays);
+        int ok = decoder.getInteger().intValue();
+        return new ProjectOK(ok);
     }
 }

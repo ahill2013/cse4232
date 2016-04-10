@@ -140,13 +140,14 @@ public class Client {
         Project response = null;
         try {
             Socket sock = new Socket(IP, port);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+            InputStream reader = sock.getInputStream();
+            OutputStream writer = sock.getOutputStream();
 
-            writer.write(input.toString());
+            writer.write(input);
             writer.flush();
-            ASNresponse = reader.readLine().getBytes();
-            response = new ASN1Project().decode(new Decoder(ASNresponse));
+            int outputSize = reader.read(ASNresponse);
+            Decoder output = new Decoder(ASNresponse, 0, outputSize);
+            ClientParser.printClientOutput(output);
 
             sock.close();
         } catch (IOException e) {

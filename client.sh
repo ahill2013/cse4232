@@ -1,15 +1,13 @@
 #!/bin/bash
-if [ $# -eq 0 ]
+
+if [ $# -eq  2 ]
 then
-	echo "Usage: client.sh <IP> <port> <optional_tag>" >&2
-elif [ $# -eq 1 ]
-then
-	echo "Usage: client.sh <IP> <port> <optional_tag>" >&2
-elif [ $# -eq  2 ]
-then
+	echo "java -cp bin/externals/*:bin client.Client $1 $2"
 	java -cp bin/externals/*:bin client.Client $1 $2
 elif [ $# -eq  3 ]
 then
-	#if [ $1 -eq  ]
+	echo "java -cp bin/externals/*:bin client.Client $1 $2 $3"
 	java -cp bin/externals/*:bin client.Client $1 $2 $3
+else
+	echo "Usage: client.sh <IP> <port> <optional_flag>" >&2
 fi

@@ -4,23 +4,16 @@ DEFAULTPORT=2132
 
 if [ $# -eq 0 ]
 then
-    # echo "Using default port number: ${DEFAULTPORT}"
+	echo "java -cp bin/externals/*:bin server.Handler -p ${DEFAULTPORT}"
     java -cp bin/externals/*:bin server.Handler -p ${DEFAULTPORT}
 elif [ $# -eq 1 ]
 then
-    # echo "Using port number: ${1}"
+    echo "java -cp bin/externals/*:bin server.Handler -p $1"
     java -cp bin/externals/*:bin server.Handler -p $1
 elif [ $# -eq 2 ]
 then
-#    if [ $1 = "-p" ]
-#    then
-#        # echo "Using port number: ${1}"
-        java -cp bin/externals/*:bin server.Handler $1 $2
-#    elif [ $1 = "-d" ]
-#    then
-#        # echo "Using default port number: ${DEFAULTPORT}"
-#        java -cp bin/externals/*:bin server.Handler -p ${DEFAULTPORT} -d $2
-#    fi
+	echo "java -cp bin/externals/*:bin server.Handler $1 $2"
+    java -cp bin/externals/*:bin server.Handler $1 $2
 elif [ $# -eq 4 ]
 then
     if [ $1 = "-p" ]
@@ -30,6 +23,7 @@ then
     then
         echo "Using port number: ${4}"
     fi
+    echo "java -cp bin/externals/*:bin server.Handler $1 $2 $3 $4"
     java -cp bin/externals/*:bin server.Handler $1 $2 $3 $4
     exit 0
 else

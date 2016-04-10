@@ -5,32 +5,21 @@ echo
 
 PORT=2135
 PROJECT_NAME=Exam2
-NETCAT="netcat localhost ${PORT}"
 DBDIR="../bin/testscripts/database"
 
 mkdir -p ${DBDIR}
 
-java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1Test.db > /dev/null 2>&1 &
+echo "java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1ASN_TCP.db &"
+java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1ASN_TCP.db &
 
 sleep 1
 
-echo "GET_PROJECTS"
-echo "GET_PROJECTS" | ${NETCAT}
-sleep 1
-echo "PROJECT_DEFINITION:${PROJECT_NAME};TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z"
-echo "PROJECT_DEFINITION:${PROJECT_NAME};TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z" | ${NETCAT}
-sleep 1
-echo "TAKE;USER:Johny;PROJECT:${PROJECT_NAME};Buy paper"
-echo "TAKE;USER:Johny;PROJECT:${PROJECT_NAME};Buy paper" | ${NETCAT}
-sleep 1
-echo "TAKE;USER:Mary;PROJECT:${PROJECT_NAME};Write exam"
-echo "TAKE;USER:Mary;PROJECT:${PROJECT_NAME};Write exam" | ${NETCAT}
-sleep 1
-echo "GET_PROJECTS"
-echo "GET_PROJECTS" | ${NETCAT}
-sleep 1
-echo "GET_PROJECT;${PROJECT_NAME}"
-echo "GET_PROJECT;${PROJECT_NAME}" | ${NETCAT}
-sleep 1
-echo "EXIT" | ${NETCAT}
+echo "PROJECT_DEFINITION:${PROJECT_NAME};TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z" > tmpinput.txt
+echo "TAKE;USER:Johny;PROJECT:${PROJECT_NAME};Buy paper" >> tmpinput.txt
+echo "TAKE;USER:Mary;PROJECT:${PROJECT_NAME};Write exam" >> tmpinput.txt
+echo "GET_PROJECTS" >> tmpinput.txt
+echo "GET_PROJECT;${PROJECT_NAME}" >> tmpinput.txt
+
+echo "java -cp ../bin/externals/*:../bin client.Client 127.0.0.1 ${PORT} < tmpinput.txt"
+java -cp ../bin/externals/*:../bin client.Client 127.0.0.1 ${PORT} < tmpinput.txt
 echo "EXIT : script1ASN_TCP.sh has finished"

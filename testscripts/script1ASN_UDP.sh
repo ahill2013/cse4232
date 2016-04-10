@@ -4,18 +4,22 @@ echo "RUNNING TEST script1ASN_UDP.sh"
 echo
 
 PORT=2135
+PROJECT_NAME=Exam2
 DBDIR="../bin/testscripts/database"
 
 mkdir -p ${DBDIR}
 
-echo "javac -d ../bin/ ../src/client/UDPClient.java"
-javac -d ../bin/ ../src/client/UDPClient.java
+echo "java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1ASN_UDP.db &"
+java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1ASN_UDP.db &
+
 sleep 1
 
-echo "java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d script1udpTest.db > /dev/null 2>&1 &"
-java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1udpTest.db > /dev/null 2>&1 &
+echo "PROJECT_DEFINITION:${PROJECT_NAME};TASKS:2;Buy paper;2016-03-12:18h30m00s001Z;2014-03-15:18h30m00s001Z;Write exam;2016-03-15:18h30m00s001Z;2014-03-15:18h30m00s001Z" > tmpinput.txt
+echo "TAKE;USER:Johny;PROJECT:${PROJECT_NAME};Buy paper" >> tmpinput.txt
+echo "TAKE;USER:Mary;PROJECT:${PROJECT_NAME};Write exam" >> tmpinput.txt
+echo "GET_PROJECTS" >> tmpinput.txt
+echo "GET_PROJECT;${PROJECT_NAME}" >> tmpinput.txt
 
-echo "java -cp ../bin client.UDPClient"
-echo
-java -cp ../bin client.UDPClient ${PORT} 1
+echo "java -cp ../bin/externals/*:../bin client.Client 127.0.0.1 ${PORT} -u < tmpinput.txt"
+java -cp ../bin/externals/*:../bin client.Client 127.0.0.1 ${PORT} -u < tmpinput.txt
 echo "EXIT : script1ASN_UDP.sh has finished"

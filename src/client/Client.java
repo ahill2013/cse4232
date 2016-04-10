@@ -43,20 +43,62 @@ public class Client {
 
     public static synchronized void main (final String args[]) throws UnknownHostException, ParseException {
 
-        // TODO add better argument handling
-        String IP = args[0];
-        int port = Integer.parseInt(args[1]);
         String flag = "-t";  // use tcp by default
-        flag = args[2];
+        String IP = "localhost";
+        int port = 2132;
+
+        // long complicated argument handling.  Should probably replace with a more efficient way eventually
+        if (args.length == 2) {
+            if (args[0].contains(".")) {
+                IP = args[0];
+                port = Integer.parseInt(args[1]);
+            } else {
+                IP = args[1];
+                port = Integer.parseInt(args[0]);
+            }
+        }
+        if (args.length == 3) {
+            if (args[0].contains(".")) {
+                IP = args[0];
+                if (args[1].equals("-t") || args[1].equals("-u")) {
+                    if (args[1].equals("-u"))
+                        flag = "-u";
+                    port = Integer.parseInt(args[2]);
+                } else {
+                    port = Integer.parseInt(args[1]);
+                    if (args[2].equals("-u"))
+                        flag = "-u";
+                }
+
+            } else if (args[1].contains(".")) {
+                IP = args[1];
+                if (args[0].equals("-t") || args[0].equals("-u")) {
+                    if (args[0].equals("-u"))
+                        flag = "-u";
+                    port = Integer.parseInt(args[2]);
+                } else {
+                    port = Integer.parseInt(args[0]);
+                    if (args[2].equals("-u"))
+                        flag = "-u";
+                }
+
+            } else {
+                IP = args[2];
+                if (args[0].equals("-t") || args[0].equals("-u")) {
+                    if (args[0].equals("-u"))
+                        flag = "-u";
+                    port = Integer.parseInt(args[1]);
+                } else {
+                    port = Integer.parseInt(args[0]);
+                    if (args[1].equals("-u"))
+                        flag = "-u";
+                }
+            }
+        }
 
         Scanner stdin = new Scanner(System.in);
-//        Thread t = null;
-//        if (flag.equals("-u")) {
-//            t = new Thread
-//
-//        }
-        while (true) {
 
+        while (true) {
 
             String input = stdin.nextLine();
 
@@ -156,43 +198,12 @@ public class Client {
         }
     }
 
-    /*
-    /**
-     * Sends UDP packets to the server. Each packet may contain multiple commands.
-     *
-     * @param command - string being sent to the server for processing
-     * @throws UnknownHostException if the specified inetAddress cannot be found on the machine
-     *//*
-    private static void sendCommandUDP(final String command) throws UnknownHostException {
-
-        if (command.equals("EXIT")) {
-            sendExitUDP();
-            System.exit(0);
-        }
-
-        final byte[] input = command.getBytes();
-        final byte[] buffer = new byte[32768];
-
-        final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
-        DatagramSocket sock;
-        try {
-            sock = new DatagramSocket();
-            sock.send(new DatagramPacket(input, input.length, inetAddress, _port));
-            DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
-            sock.receive(receipt);
-            System.out.println(new String(receipt.getData(), StandardCharsets.UTF_8) );
-            System.out.flush();
-            receipt.setData(new byte[buffer.length]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
+/*
     /**
      * This method sends the command to shutdown the server over UDP, and close this program
      *
      * @throws UnknownHostException if the specified inetAddress cannot be found on the machine
-     */
+     *//*
     private void sendExitUDP() throws UnknownHostException {
         final byte[] command = ("EXIT").getBytes();
 
@@ -205,4 +216,5 @@ public class Client {
             e.printStackTrace();
         }
     }
+    */
 }

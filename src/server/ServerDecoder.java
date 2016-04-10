@@ -9,6 +9,7 @@ import server.BackEnd;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,13 +59,16 @@ public class ServerDecoder {
                         input.addIP(ipAddress);
                         ok = queryProject(conn, sdf, input);
                         projectOK.addOkay(ok);
-                        response = new ASN1Project(input).getEncoder().getBytes();
 
                         // Procedure for failure to get the project
                         if (ok != 0) {
                             System.out.print("FAIL;");
                             System.out.println(input);
+                            response = new ASN1Project(input).getEncoder().getBytes();
                         } else {
+                            Project output = queryGetProject(conn, sdf, input.getName());
+                            response = new ASN1Project(output).getEncoder().getBytes();
+
                             System.out.println(queryGetProject(conn, sdf, input.getName()));
                         }
 
@@ -209,11 +213,28 @@ public class ServerDecoder {
             Date end = sdf.parse(task[2]);
             String ip = task[3];
             int port = Integer.parseInt(task[4]);
+
             boolean status = Boolean.parseBoolean(task[5]);
+
+            if (!status && isDone(end) >= 0) {
+                BackEnd.setStatus(conn, projectName, taskName, 1);
+                status = true;
+            }
+
             Task t = new Task(taskName, start, end, ip, port, status);
             p.addTask(t);
         }
         return p;
+    }
+
+    private static int isDone(final Date end) {
+        try {
+            final Date current = new Date();
+            return current.compareTo(end);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Integer.MIN_VALUE;
+        }
     }
 
 }

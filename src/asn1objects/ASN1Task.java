@@ -51,6 +51,7 @@ public class ASN1Task extends ASNObj {
         enc.addToSequence(new Encoder(task.getName()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(Long.toString(task.getStartTime().getTime())).setASN1Type(Encoder.TAG_GeneralizedTime));
         enc.addToSequence(new Encoder(Long.toString(task.getEndTime().getTime())).setASN1Type(Encoder.TAG_GeneralizedTime));
+        enc.addToSequence(new Encoder(task.getUser()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(task.getIP()).setASN1Type(Encoder.TAG_UTF8String));
         enc.addToSequence(new Encoder(task.getPort()).setASN1Type(Encoder.TAG_INTEGER));
         enc.addToSequence(new Encoder(task.getStatus()).setASN1Type(Encoder.TAG_BOOLEAN));
@@ -71,10 +72,11 @@ public class ASN1Task extends ASNObj {
         String name = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         Date start = new Date(Long.parseLong(dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime)));
         Date end = new Date(Long.parseLong(dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime)));
+        String user = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         String ip = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         int port = dec.getFirstObject(true).getInteger(Encoder.TAG_INTEGER).intValue();
         boolean status = dec.getFirstObject(true).getBoolean(Encoder.TAG_BOOLEAN);
 
-        return new Task(name, start, end, ip, port, status);
+        return new Task(name, start, end, user, ip, port, status);
     }
 }

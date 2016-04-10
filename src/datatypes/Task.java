@@ -13,7 +13,9 @@ public class Task {
     private String name;
     private Date start;
     private Date end;
+    private String user;
     private String ip;
+
     private int port;
     private boolean status;
 
@@ -23,6 +25,17 @@ public class Task {
         this.name = name;
         this.start = start;
         this.end = end;
+        this.user = " ";
+        this.ip = ip;
+        this.port = port;
+        this.status = status;
+    }
+
+    public Task(String name, Date start, Date end, String user, String ip, int port, boolean status) {
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.user = user;
         this.ip = ip;
         this.port = port;
         this.status = status;
@@ -42,6 +55,7 @@ public class Task {
         task.append(name + ";");
         task.append(_sdf.format(start) + ";");
         task.append(_sdf.format(end) + ";");
+        task.append(user + ";");
         task.append(ip + ";");
         task.append(port + ";");
         task.append(status + ";");
@@ -70,5 +84,9 @@ public class Task {
 
     public boolean getStatus() {
         return status;
+    }
+
+    public String getUser() {
+        return user;
     }
 }

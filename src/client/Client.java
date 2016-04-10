@@ -134,10 +134,9 @@ public class Client {
         }
     }
 
-    private static synchronized String sendCommandTCP(final byte[] input, final String IP, final int port) {
+    private static synchronized void sendCommandTCP(final byte[] input, final String IP, final int port) {
 
-        byte[] ASNresponse = null;
-        Project response = null;
+        byte[] ASNresponse = new byte[32768];
         try {
             Socket sock = new Socket(IP, port);
             InputStream reader = sock.getInputStream();
@@ -155,8 +154,6 @@ public class Client {
         } catch (ASN1DecoderFail asn1DecoderFail) {
             asn1DecoderFail.printStackTrace();
         }
-
-        return response.toString();
     }
 
     /*

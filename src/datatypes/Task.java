@@ -58,7 +58,11 @@ public class Task {
         task.append(user + ";");
         task.append(ip + ";");
         task.append(port + ";");
-        task.append(status + ";");
+        if (status) {
+            task.append("DONE;");
+        } else {
+            task.append("WAITING;");
+        }
         return task.toString();
     }
 

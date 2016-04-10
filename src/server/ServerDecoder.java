@@ -211,10 +211,10 @@ public class ServerDecoder {
             String taskName = task[0];
             Date start = sdf.parse(task[1]);
             Date end = sdf.parse(task[2]);
-            String ip = task[3];
-            int port = Integer.parseInt(task[4]);
-
-            boolean status = Boolean.parseBoolean(task[5]);
+            String user = task[3];
+            boolean status = Boolean.parseBoolean(task[4]);
+            String ip = task[5];
+            int port = Integer.parseInt(task[6]);
 
             if (!status && isDone(end) >= 0) {
                 BackEnd.setStatus(conn, projectName, taskName, 1);

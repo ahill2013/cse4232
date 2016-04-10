@@ -21,6 +21,8 @@
 
 package server;
 
+import net.ddp2p.ASN1.Decoder;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -29,8 +31,6 @@ import java.net.SocketException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-import net.ddp2p.ASN1.Decoder;
 
 /**
  * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of

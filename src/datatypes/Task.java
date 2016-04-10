@@ -1,7 +1,5 @@
 package datatypes;
 
-import net.ddp2p.ASN1.ASNObj;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

@@ -10,9 +10,6 @@ import net.ddp2p.ASN1.ASNObj;
 import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class ASN1ProjectOK extends ASNObj {
     public static final int TAGVALUE = 3;
 

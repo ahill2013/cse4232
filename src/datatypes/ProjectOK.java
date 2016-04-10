@@ -1,8 +1,5 @@
 package datatypes;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Abstract version of ASN1ProjectOK. Contains list of the outcomes of the server's attempts
  * to decode and interact with database for successfully decoded tasks.

@@ -4,20 +4,15 @@ import asn1objects.*;
 import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
-import net.ddp2p.ASN1.Encoder;
-import server.BackEnd;
+import org.apache.http.util.ByteArrayBuffer;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 import java.util.LinkedList;
-import org.apache.http.util.ByteArrayBuffer;
-public class ClientParser {
 
-    public static final int NUMTASKCOMPONENTS = 3;
+public class ClientParser {
 
     /**
      * Given input execute all commands

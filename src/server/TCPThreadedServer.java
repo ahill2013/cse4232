@@ -21,8 +21,8 @@
 
 package server;
 
-import java.net.BindException;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 
 /**

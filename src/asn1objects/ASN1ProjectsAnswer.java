@@ -1,7 +1,6 @@
 package asn1objects;
 
 import datatypes.Project;
-import datatypes.Projects;
 import datatypes.ProjectsAnswer;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;

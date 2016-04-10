@@ -19,7 +19,6 @@
 /* ------------------------------------------------------------------------- */
  package net.ddp2p.ASN1;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 
 /**

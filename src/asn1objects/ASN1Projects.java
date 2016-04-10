@@ -5,7 +5,6 @@ import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.ASNObj;
 import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
-import java.util.List;
 
 /**
  * List of projects in the database by name. Encoded and decoded here.

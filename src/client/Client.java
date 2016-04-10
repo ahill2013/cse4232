@@ -21,30 +21,24 @@
 
 package client;
 
-import java.io.*;
+import net.ddp2p.ASN1.ASN1DecoderFail;
+import net.ddp2p.ASN1.Decoder;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-//import asn1.net.ddp2p.ASN1.*;
-import asn1objects.ASN1Project;
-//import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
-import datatypes.Project;
-import net.ddp2p.ASN1.ASN1DecoderFail;
-import net.ddp2p.ASN1.Decoder;
-import net.ddp2p.ASN1.Encoder;
 
 public class Client {
-    static int BUFFER = 32500;
-    static int _port;
-    private boolean _running = false;
-
 
     public static synchronized void main (final String args[]) throws UnknownHostException, ParseException {
 
         String flag = "-t";  // use tcp by default
-        String IP = "localhost";
+        String IP = "127.0.0.1";
         int port = 2132;
 
         // long complicated argument handling.  Should probably replace with a more efficient way eventually
@@ -156,26 +150,6 @@ public class Client {
         }
     }
 
-    private static void receiveUDP() throws UnknownHostException {
-        DatagramSocket sock;
-        byte[] buffer = new byte[BUFFER];
-        try {
-            sock = new DatagramSocket();
-
-            while (true) {
-                DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
-                sock.receive(receipt);
-                ClientParser.printClientOutput(new Decoder(receipt.getData()));
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ASN1DecoderFail e) {
-            e.printStackTrace();
-        }
-    }
-
     private static synchronized void sendCommandTCP(final byte[] input, final String IP, final int port) {
 
         byte[] ASNresponse = new byte[32768];
@@ -198,23 +172,4 @@ public class Client {
         }
     }
 
-/*
-    /**
-     * This method sends the command to shutdown the server over UDP, and close this program
-     *
-     * @throws UnknownHostException if the specified inetAddress cannot be found on the machine
-     *//*
-    private void sendExitUDP() throws UnknownHostException {
-        final byte[] command = ("EXIT").getBytes();
-
-        final InetAddress inetAddress = InetAddress.getByName("127.0.0.1");
-        DatagramSocket sock;
-        try {
-            sock = new DatagramSocket();
-            sock.send(new DatagramPacket(command, command.length, inetAddress, _port));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    */
 }

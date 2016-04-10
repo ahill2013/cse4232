@@ -86,7 +86,7 @@ public class TCPHandler implements Runnable {
             System.out.println("TCP Connection: " + IP);
 
             // Byte streams that read and write output from socket
-            InputStream reader = _sock.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(_sock.getInputStream()));
             OutputStream writer = _sock.getOutputStream();
 
             // Greet User upon connection to server
@@ -107,14 +107,16 @@ public class TCPHandler implements Runnable {
 
                 // Read in input, EOF means that there was an error reading input
 
-                int inputSize = reader.read(input);
+
+                int inputSize = reader.read();
 
                 if (inputSize == -1) {
                     break;
                 }
 
                 // Decode and reply
-                byte[] output = ServerDecoder.serverQuery(_dbfile, _sdf, new Decoder(input, 0, inputSize), IP, clientPort);
+                Decoder dec = new Decoder(input, 0, inputSize);
+                byte[] output = ServerDecoder.serverQuery(_dbfile, _sdf, dec, IP, clientPort);
 
                 if (output.length > BUFFER_SIZE) {
                     break;

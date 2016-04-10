@@ -63,8 +63,10 @@ public class ServerDecoder {
                         // Procedure for failure to get the project
                         if (ok != 0) {
                             System.out.print("FAIL;");
+                            System.out.println(input);
+                        } else {
+                            System.out.println(queryGetProject(conn, sdf, input.getName()));
                         }
-                        System.out.println(input);
 
                         break;
                     case ASN1Take.TAGVALUE:

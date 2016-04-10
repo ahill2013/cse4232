@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "RUNNING TEST script1udp.sh"
+echo "RUNNING TEST script1ASN_UDP.sh"
 echo
 
 PORT=2135
@@ -18,4 +18,4 @@ java -cp ../bin/externals/*:../bin server.Handler -p ${PORT} -d ${DBDIR}/script1
 echo "java -cp ../bin client.UDPClient"
 echo
 java -cp ../bin client.UDPClient ${PORT} 1
-echo "EXIT : script1udp.sh has finished"
+echo "EXIT : script1ASN_UDP.sh has finished"

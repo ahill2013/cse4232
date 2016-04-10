@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "RUNNING TEST script1.sh"
+echo "RUNNING TEST script1ASN_TCP.sh"
 echo
 
 PORT=2135
@@ -33,4 +33,4 @@ echo "GET_PROJECT;${PROJECT_NAME}"
 echo "GET_PROJECT;${PROJECT_NAME}" | ${NETCAT}
 sleep 1
 echo "EXIT" | ${NETCAT}
-echo "EXIT : script1.sh has finished"
+echo "EXIT : script1ASN_TCP.sh has finished"

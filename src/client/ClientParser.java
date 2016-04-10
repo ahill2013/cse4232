@@ -1,10 +1,7 @@
 package client;
 
 import asn1objects.*;
-import datatypes.Project;
-import datatypes.ProjectOK;
-import datatypes.Take;
-import datatypes.Task;
+import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 import net.ddp2p.ASN1.Encoder;
@@ -91,13 +88,15 @@ public class ClientParser {
                     byte[] encodedGetProjects = new ASN1GetProjects().getEncoder().getBytes();
                     serverCommands.add(encodedGetProjects);
                     serverCommandBytes += encodedGetProjects.length;
-
+                    index += 1;
                     break;
                 case "GET_PROJECT":
                     final String projectName = commands[index + 1];
-                    byte[] encodedGetProject = new ASN1GetProject().getEncoder().getBytes();
+                    ASN1GetProject asn1gp = new ASN1GetProject(new GetProject(projectName));
+                    byte[] encodedGetProject = asn1gp.getEncoder().getBytes();
                     serverCommands.add(encodedGetProject);
                     serverCommandBytes += encodedGetProject.length;
+                    index += 2;
                     break;
                 default:
                     throw new IOException("Unrecognized command");
@@ -141,7 +140,7 @@ public class ClientParser {
                     throw new ASN1DecoderFail("Unrecognized asn1 object");
             }
         }
-
+        System.out.println(sb);
     }
 
 }

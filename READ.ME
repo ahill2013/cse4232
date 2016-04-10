@@ -2,30 +2,34 @@ Student Names:
     Adam Hill
     William Nyffenegger
 
-Milestone Number 2
+Milestone Number 4
 
 To build and compile this project run compile.sh or the make command:
 
     bash compile.sh
-    
     - OR -
-    
     make
 
-To run the program, run the script run.sh.  Both the -p and -d flags are optional, however it is
+To run the server, run the script run.sh.  Both the -p and -d flags are optional, however it is
 highly recommended to use them to avoid error.  If the database does not exist then a new one will be created.
 
-    bash run.sh               // starts server on default port 2132 with default db location
-    bash run.sh <port number> // starts server on a specified port with default db location
-    bash run.sh -p <port number> -d <path/to/sqlite/db/file.db> // starts server with specified port and db location
+    bash run.sh        // starts server on default port 2132 with default db location
+    bash run.sh <port> // starts server on a specified port with default db location
+    bash run.sh -p <port> -d <path/to/sqlite/db/file.db> // starts server with specified port and db location
     
-To connect to the server once it is running, use netcat from a different terminal and/or computer
-and specify the IP and port number.
+To connect to the server once it is running, run the client script, client.sh, and specify the IP and
+port you would like to connect to.  Default transfer protocol is TCP, however you may use UDP if you
+wish by adding another (optional) flag "-u" to the command-line arguments.
 
-    netcat 127.0.0.1 2132  // example connecting to the server running on the localhost on port 2132
+    bash client.sh <IP_address> <port>    // starts client at specified IP and port using TCP
+    bash client.sh <IP_address> <port> -u // starts client at specified IP and port using UDP
 
 
-Alternatively, you may wish to not use a script to run the program.  Navigate to the folder /cse4232
+Alternatively, you may wish to not use a script to run the server or client.  Navigate to the folder cse4232/
 and execute:
 
-    java -cp bin/externals/*:bin/*.class:bin:. Handler -p <port number> -d ~/path/to/db/location.db
+    java -cp bin/externals/*:bin server.Handler -p <port> -d ~/path/to/db/location.db // server
+    - AND -
+    java -cp bin/externals/*:bin client.Client <IP_address> <port>                    // client
+
+Test scripts are available for you to run in cse4232/testscripts/

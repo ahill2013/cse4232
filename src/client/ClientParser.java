@@ -1,9 +1,12 @@
 package client;
 
 import asn1objects.*;
+
 import datatypes.*;
+
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
+
 import org.apache.http.util.ByteArrayBuffer;
 
 import java.io.IOException;
@@ -79,7 +82,6 @@ public class ClientParser {
                     index += 4;
                     break;
                 case "GET_PROJECTS":
-
                     byte[] encodedGetProjects = new ASN1GetProjects().getEncoder().getBytes();
                     serverCommands.add(encodedGetProjects);
                     serverCommandBytes += encodedGetProjects.length;
@@ -92,6 +94,12 @@ public class ClientParser {
                     serverCommands.add(encodedGetProject);
                     serverCommandBytes += encodedGetProject.length;
                     index += 2;
+                    break;
+                case "REGISTER":
+                    //TODO register case
+                    break;
+                case "LEAVE":
+                    //TODO leave case
                     break;
                 default:
                     throw new IOException("Unrecognized command");

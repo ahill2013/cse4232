@@ -24,6 +24,8 @@ package client;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 
+import org.apache.commons.cli.CommandLine;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,97 +39,103 @@ public class Client {
 
     public static synchronized void main (final String args[]) throws UnknownHostException, ParseException {
 
-        String flag = "-t";  // use tcp by default
-        String IP = "127.0.0.1";
-        int port = 2132;
+        String m_args[] = args;
 
-        // long complicated argument handling.  Should probably replace with a more efficient way eventually
-        if (args.length == 2) {
-            if (args[0].contains(".")) {
-                IP = args[0];
-                port = Integer.parseInt(args[1]);
+        OptParser parseArgs = new OptParser();
+        CommandLine cmd;
+
+        try {
+            cmd = parseArgs.getCMD(m_args);
+            String nonOptsArgs[] = new String[2];
+            int count = 0;
+            while (cmd.getArgs().length > 0) {
+                nonOptsArgs[count] = cmd.getArgs()[0];
+                String newArgs[] = new String[m_args.length-1];
+                int counter = 0;
+                for (String arg: m_args) {
+                    if (!nonOptsArgs[count].equals(arg)) {
+                        newArgs[counter] = arg;
+                        counter++;
+                    }
+                }
+                m_args = newArgs;
+                count++;
+                cmd = parseArgs.getCMD(newArgs);
+            }
+            // NOTE: nonOptsArgs[1] may be null. I am assuming if -d was not specified then it is no
+            //       longer null, and an IP and port were given. If -d was specified then I assume
+            //       that there is no IP and the port is in nonOptsArgs[0]
+            String IP = null;
+            int port;
+            if (cmd.hasOption("d")) {
+                port = Integer.parseInt(nonOptsArgs[0]);
             } else {
-                IP = args[1];
-                port = Integer.parseInt(args[0]);
-            }
-        }
-        if (args.length == 3) {
-            if (args[0].contains(".")) {
-                IP = args[0];
-                if (args[1].equals("-t") || args[1].equals("-u")) {
-                    if (args[1].equals("-u"))
-                        flag = "-u";
-                    port = Integer.parseInt(args[2]);
+                if (nonOptsArgs[0].equals("localhost")) nonOptsArgs[0] = "127.0.0.1";
+                if (nonOptsArgs[1].equals("localhost")) nonOptsArgs[1] = "127.0.0.1";
+                if (nonOptsArgs[0].contains(".")) {
+                    IP = nonOptsArgs[0];
+                    port = Integer.parseInt(nonOptsArgs[1]);
                 } else {
-                    port = Integer.parseInt(args[1]);
-                    if (args[2].equals("-u"))
-                        flag = "-u";
-                }
-
-            } else if (args[1].contains(".")) {
-                IP = args[1];
-                if (args[0].equals("-t") || args[0].equals("-u")) {
-                    if (args[0].equals("-u"))
-                        flag = "-u";
-                    port = Integer.parseInt(args[2]);
-                } else {
-                    port = Integer.parseInt(args[0]);
-                    if (args[2].equals("-u"))
-                        flag = "-u";
-                }
-
-            } else {
-                IP = args[2];
-                if (args[0].equals("-t") || args[0].equals("-u")) {
-                    if (args[0].equals("-u"))
-                        flag = "-u";
-                    port = Integer.parseInt(args[1]);
-                } else {
-                    port = Integer.parseInt(args[0]);
-                    if (args[1].equals("-u"))
-                        flag = "-u";
+                    IP = nonOptsArgs[1];
+                    port = Integer.parseInt(nonOptsArgs[0]);
                 }
             }
+
+            Scanner stdin = new Scanner(System.in);
+
+            while (true) {
+
+                // display help menu
+                if (cmd.hasOption("h")) {
+                    OptParser.printHelpMenu();
+                    break;
+                }
+
+                // handle conflicting flags
+                if (cmd.hasOption("t") && cmd.hasOption("u")) {
+                    System.err.println("Cannot use both 't' and 'u' flags at the same time.");
+                    System.err.println("Choose only one.");
+                    break;
+                }
+
+                // read user input
+                String input = stdin.nextLine();
+
+                // Get out of program
+                if (input.equals("EXIT")) {
+                    break;
+                }
+
+                byte[] serverInput;
+                try {
+                    serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'"));
+
+                    if (cmd.hasOption("d")) {
+                        if (cmd.hasOption("u")) sendCommandUDP(serverInput, cmd.getOptionValue("d"), port);
+                        else sendCommandTCP(serverInput, cmd.getOptionValue("d"), port);
+                    } else {
+                        if (cmd.hasOption("u")) sendCommandUDP(serverInput, IP, port);
+                        else sendCommandTCP(serverInput, IP, port);
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Poor Command entered");
+                    System.out.println(e.getMessage());
+                    continue;
+                }
+
+                System.out.println();
+
+            }
+        } catch (org.apache.commons.cli.ParseException e) {
+            e.printStackTrace();
         }
-
-        Scanner stdin = new Scanner(System.in);
-
-        while (true) {
-
-            String input = stdin.nextLine();
-
-            // Get out of program
-            if (input.equals("EXIT")) {
-                break;
-            }
-
-
-            byte[] serverInput;
-            try {
-                serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'"));
-
-                if (flag.equals("-t")) {
-                    sendCommandTCP(serverInput, IP, port);
-                } else if (flag.equals("-u")) {
-                    sendCommandUDP(serverInput, IP, port);
-                }
-
-            } catch (Exception e) {
-                System.out.println("Poor Command entered");
-                System.out.println(e.getMessage());
-                continue;
-            }
-
-            System.out.println();
-
-        }
-
 
     }
 
-    private static void sendCommandUDP(final byte[] input, String IP, int _port) throws UnknownHostException {
+    private static void sendCommandUDP(final byte[] input, final String host, final int _port) throws UnknownHostException {
 
-        final InetAddress inetAddress = InetAddress.getByName(IP);
+        final InetAddress inetAddress = InetAddress.getByName(host);
         DatagramSocket sock;
         try {
             byte[] buffer = new byte[4*1024];
@@ -150,11 +158,11 @@ public class Client {
         }
     }
 
-    private static synchronized void sendCommandTCP(final byte[] input, final String IP, final int port) {
+    private static synchronized void sendCommandTCP(final byte[] input, final String host, final int port) {
 
         byte[] ASNresponse = new byte[32768];
         try {
-            Socket sock = new Socket(IP, port);
+            Socket sock = new Socket(host, port);
             InputStream reader = sock.getInputStream();
             OutputStream writer = sock.getOutputStream();
 

@@ -50,7 +50,7 @@ public class UDPHandler implements Runnable {
      * engine is an input parser inputs containing a connection instance for the database
      */
 
-    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'");
+    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd:HH'h'mm'm'ss's'SSS'Z'");
 
     private String _dbfile;
     private int _port;

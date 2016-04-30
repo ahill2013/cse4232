@@ -56,7 +56,7 @@ public class TCPHandler implements Runnable {
      * Date format that is expected from asn1 objects along with the location of the database and the already
      * opened socket for use
      */
-    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dddd:hh'h'mm'm'ss's'SSS'Z'");
+    private SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dddd:HH'h'mm'm'ss's'SSS'Z'");
     private String _dbfile;
     private Socket _sock;
 

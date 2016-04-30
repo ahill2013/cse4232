@@ -132,14 +132,22 @@ public class ClientParser {
 
         while(!dec.isEmptyContainer()) {
 
-            ProjectOK pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
-            if (pOK.getOkays() == 0) {
-                sb.append("OK;");
-            } else {
-                sb.append("FAIL;");
-            }
+//            ProjectOK pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
+//            if (pOK.getOkays() == 0) {
+//                sb.append("OK;");
+//            } else {
+//                sb.append("FAIL;");
+//            }
 
             switch(dec.tagVal()) {
+                case ASN1ProjectOK.TAGVALUE:
+                    ProjectOK pOK = new ASN1ProjectOK().decode(dec.getFirstObject(true));
+                    if (pOK.getOkays() == 0) {
+                        sb.append("OK;");
+                    } else {
+                        sb.append("FAIL;");
+                    }
+                    break;
                 case ASN1Project.TAGVALUE:
                     sb.append(new ASN1Project().decode(dec.getFirstObject(true)).toString());
                     break;

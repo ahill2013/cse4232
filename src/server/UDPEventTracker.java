@@ -23,7 +23,20 @@ public class UDPEventTracker {
         _port = port;
         scheduled = new LinkedList<>();
     }
+    public void update() {
+        Iterator<ProjectReporter> sch = scheduled.iterator();
+        while (sch.hasNext()) {
+            ProjectReporter pr = sch.next();
+            if (!pr.active()) {
+                pr.kill();
+                sch.remove();
+            }
+        }
+    }
 
+    public int size() {
+        return scheduled.size();
+    }
     public ProjectReporter getPR(String project) {
         if (!scheduled.isEmpty()) {
             for (ProjectReporter st : scheduled) {
@@ -46,7 +59,7 @@ public class UDPEventTracker {
         return false;
     }
 
-    public void addAllTasks(String project, LinkedList<Task> tasks) {
+    public int addAllTasks(String project, LinkedList<Task> tasks) {
         ProjectReporter pr = null;
         if (scheduled.contains(project)) {
             pr = getPR(project);
@@ -54,7 +67,7 @@ public class UDPEventTracker {
         if (pr == null) {
             pr = new ProjectReporter(new Timer(), project);
         }
-        pr.addAllTasks(tasks);
+        return pr.addAllTasks(tasks);
 
     }
 

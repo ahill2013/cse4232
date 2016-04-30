@@ -258,8 +258,13 @@ public class UDPDecoder {
     private int executeEnter(Connection conn, SimpleDateFormat sdf, EnterLeave el, InetAddress ip, int port) {
         UDPEventTracker etracker = new UDPEventTracker(ip, port);
         try {
+            int added = 0;
             for (String project : el.getProjects()) {
-                etracker.addAllTasks(project, queryGetProject(conn, sdf, project).getTasks());
+                added += etracker.addAllTasks(project, queryGetProject(conn, sdf, project).getTasks());
+            }
+
+            // If tasks were added then add the tracker to the current list of running trackers
+            if (added > 0) {
                 _udpet.add(etracker);
             }
         } catch (ParseException e) {

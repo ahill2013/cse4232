@@ -34,7 +34,7 @@ public class ClientListener implements Runnable {
                 DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
 
                 _sock.receive(dp);
-                ClientParser.printClientOutput(new Decoder(dp.getData()));
+                ClientParser.printClientOutput(new Decoder(dp.getData(), 0, dp.getLength()));
             }
         } catch (SocketException e) {
             e.printStackTrace();

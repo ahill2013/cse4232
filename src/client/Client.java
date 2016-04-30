@@ -118,7 +118,7 @@ public class Client {
 
                 byte[] serverInput;
                 try {
-                    serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'"));
+                    serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:HH'h'mm'm'ss's'SSS'Z'"));
 
                     if (cmd.hasOption("d")) {
                         if (cmd.hasOption("u")) sendCommandUDP(sock, serverInput, cmd.getOptionValue("d"), port);

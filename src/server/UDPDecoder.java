@@ -43,6 +43,7 @@ public class UDPDecoder {
      * not exist
      */
     public byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, InetAddress packet_address, int port) throws SQLException, ParseException {
+
         String ipAddress = packet_address.toString().substring(packet_address.toString().indexOf('/') + 1);
         LinkedList<Integer> okays = new LinkedList<>();
 

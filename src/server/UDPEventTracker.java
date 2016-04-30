@@ -1,10 +1,8 @@
 package server;
 
-import datatypes.Project;
 import datatypes.Task;
 
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -67,8 +65,12 @@ public class UDPEventTracker {
         if (pr == null) {
             pr = new ProjectReporter(new Timer(), project);
         }
-        return pr.addAllTasks(tasks);
 
+        int added = pr.addAllTasks(tasks);
+        if (added > 0 ) {
+            scheduled.add(pr);
+        }
+        return added;
     }
 
     public void remove(LinkedList<String> project) {

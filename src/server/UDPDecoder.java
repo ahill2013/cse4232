@@ -23,9 +23,14 @@ public class UDPDecoder {
 
     public static final int FAILURE = -1;
     private LinkedList<UDPEventTracker> _udpet;
+
+    private static final long timetoupdate = 300000;
+    private long lastupdate;
+
     public boolean _running = true;
 
     public UDPDecoder() {
+        lastupdate = System.currentTimeMillis();
         _udpet = new LinkedList<>();
     }
 
@@ -258,6 +263,7 @@ public class UDPDecoder {
     private int executeEnter(Connection conn, SimpleDateFormat sdf, EnterLeave el, InetAddress ip, int port) {
         UDPEventTracker etracker = new UDPEventTracker(ip, port);
         try {
+            checkStatusTrackers();
             int added = 0;
             for (String project : el.getProjects()) {
                 added += etracker.addAllTasks(project, queryGetProject(conn, sdf, project).getTasks());
@@ -279,6 +285,7 @@ public class UDPDecoder {
             UDPEventTracker tracker = trackers.next();
             if (tracker.equals(ip, port)) {
                 tracker.remove(el.getProjects());
+
                 trackers.remove();
                 return 0;
             }
@@ -298,6 +305,20 @@ public class UDPDecoder {
         } catch (Exception e) {
             e.printStackTrace();
             return Integer.MIN_VALUE;
+        }
+    }
+
+    private void checkStatusTrackers() {
+        long x = System.currentTimeMillis() - lastupdate;
+        if (timetoupdate < x) {
+            Iterator<UDPEventTracker> eventTracker = _udpet.iterator();
+            while (eventTracker.hasNext()) {
+                UDPEventTracker tracker = eventTracker.next();
+                tracker.update();
+                if (tracker.size() == 0) {
+                    eventTracker.remove();
+                }
+            }
         }
     }
 

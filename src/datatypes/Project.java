@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Project {
     private String name;
-    private List<Task> taskList;
+    private LinkedList<Task> taskList;
 
     /**
      * Constructor
@@ -29,7 +29,7 @@ public class Project {
      * @param name project name
      * @param tasks list of tasks associated with project
      */
-    public Project(String name, List<Task> tasks) {
+    public Project(String name, LinkedList<Task> tasks) {
         this.name = name;
         this.taskList = tasks;
     }
@@ -51,7 +51,7 @@ public class Project {
         return name;
     }
 
-    public List<Task> getTasks() {
+    public LinkedList<Task> getTasks() {
         return taskList;
     }
     public void addTask(Task t) {

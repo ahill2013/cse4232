@@ -6,12 +6,12 @@ import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 import org.apache.http.util.ByteArrayBuffer;
 
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Static class with one public method to deal with a single request from
@@ -19,9 +19,15 @@ import java.util.LinkedList;
  *
  * serverQuery is only public method and handles all of this
  */
-public class ServerDecoder {
+public class UDPDecoder {
 
     public static final int FAILURE = -1;
+    private LinkedList<UDPEventTracker> _udpet;
+    public boolean _running = true;
+
+    public UDPDecoder() {
+        _udpet = new LinkedList<>();
+    }
 
     /**
      * Takes a database location, desired date format (not controlled by user)
@@ -36,8 +42,8 @@ public class ServerDecoder {
      * @throws SQLException if the database is locked or the location of the data base does
      * not exist
      */
-    public static byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, String ipAddress, int port) throws SQLException, ParseException {
-
+    public byte[] serverQuery(String _dbfile, SimpleDateFormat sdf, Decoder dec, InetAddress packet_address, int port) throws SQLException, ParseException {
+        String ipAddress = packet_address.toString().substring(packet_address.toString().indexOf('/') + 1);
         LinkedList<Integer> okays = new LinkedList<>();
 
         int numBytes = 0;
@@ -117,17 +123,40 @@ public class ServerDecoder {
                         System.out.println(gp);
                         System.out.println(output);
                         break;
+                    case ASN1Enter.TAGVALUE:
+                        EnterLeave enter = new ASN1Enter().decode(dec.getFirstObject(true));
+                        ok = executeEnter(conn, sdf, enter, packet_address, port);
+
+                        if (ok == FAILURE) {
+                            System.out.println("FAIL;");
+                        }
+                        System.out.println(enter);
+                        response = new ASN1Enter(enter).getEncoder().getBytes();
+                        break;
+                    case ASN1Leave.TAGVALUE:
+                        EnterLeave leave = new ASN1Leave().decode(dec.getFirstObject(true));
+                        ok = executeLeave(leave, packet_address, port);
+
+                        if (ok == FAILURE) {
+                            System.out.println("FAIL;");
+                        }
+                        System.out.println(leave);
+                        response = new ASN1Leave(leave).getEncoder().getBytes();
+                        break;
                     default:
                         throw new ASN1DecoderFail("Invalid ASN1 Tag Value");
                 }
 
-                if (ok == 0) {
-                    byte[] okay = new ASN1ProjectOK(0).getEncoder().getBytes();
-                    responses.add(okay);
-                    numBytes += okay.length;
-                }
-                numBytes += response.length;
+//                if (ok == 0) {
+//                    byte[] okay = new ASN1ProjectOK(0).getEncoder().getBytes();
+//                    responses.add(okay);
+//                    numBytes += okay.length;
+//                }
+                byte[] okay = new ASN1ProjectOK(ok).getEncoder().getBytes();
+                responses.add(okay);
+                numBytes += okay.length;
                 responses.add(response);
+                numBytes += response.length;
                 okays.add(ok);
             }
 
@@ -225,6 +254,38 @@ public class ServerDecoder {
         return p;
     }
 
+
+    private int executeEnter(Connection conn, SimpleDateFormat sdf, EnterLeave el, InetAddress ip, int port) {
+        UDPEventTracker etracker = new UDPEventTracker(ip, port);
+        try {
+            for (String project : el.getProjects()) {
+                etracker.addAllTasks(project, queryGetProject(conn, sdf, project).getTasks());
+                _udpet.add(etracker);
+            }
+        } catch (ParseException e) {
+            return FAILURE;
+        }
+        return 0;
+    }
+
+    private int executeLeave(EnterLeave el, InetAddress ip, int port) {
+        Iterator<UDPEventTracker> trackers = _udpet.iterator();
+        while (trackers.hasNext()) {
+            UDPEventTracker tracker = trackers.next();
+            if (tracker.equals(ip, port)) {
+                tracker.remove(el.getProjects());
+                trackers.remove();
+                return 0;
+            }
+        }
+        return FAILURE;
+    }
+
+    /**
+     * Is the task done yet?
+     * @param end the final time of the task
+     * @return whether it is before, after, or during the task's execution
+     */
     private static int isDone(final Date end) {
         try {
             final Date current = new Date();

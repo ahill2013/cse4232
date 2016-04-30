@@ -33,7 +33,7 @@ public class ASN1Project extends ASNObj {
     public ASN1Project(Project p) {
         _project = p;
     }
-    public ASN1Project(String name, List<Task> tasks) {
+    public ASN1Project(String name, LinkedList<Task> tasks) {
         _project = new Project(name, tasks);
     }
 
@@ -63,7 +63,7 @@ public class ASN1Project extends ASNObj {
     public Project decode(Decoder dec) throws ASN1DecoderFail {
 
         String name;
-        List<Task> tasks = new LinkedList<Task>();
+        LinkedList<Task> tasks = new LinkedList<Task>();
         Decoder decoder = dec.getContent();
         name = decoder.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         while (!decoder.isEmptyContainer()) {

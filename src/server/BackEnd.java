@@ -89,13 +89,19 @@ public class BackEnd {
             create.executeUpdate(addProjectName);
             if (tasks > 0) {
                 String taskTable = getTaskTable(projectName);
+                String enteredTable =getEnteredTable(projectName);
+
                 String dropTable = "DROP TABLE IF EXISTS '" + taskTable + "'";
+                String dropEntered = "DROP TABLE IF EXISTS '" + enteredTable +"'";
                 create.execute(dropTable);
+                create.execute(dropEntered);
                 conn.commit();
                 final String createTable = "CREATE TABLE '" + taskTable +
                         "'(NAME TEXT NOT NULL, START TEXT NOT NULL, END TEXT NOT NULL, OWNER TEXT," +
                         " STATUS INT NOT NULL, IP TEXT NOT NULL, PORT INT NOT NULL)";
                 create.execute(createTable);
+                final String createEntered = "CREATE TABLE '" + enteredTable + "' (NAME TEXT NOT NULL)";
+                create.execute(createEntered);
             }
             conn.commit();
         } catch (SQLException e) {
@@ -191,6 +197,44 @@ public class BackEnd {
     }
 
     /**
+     * Register a user for a project that already exists
+     * @param conn already open connection to the database
+     * @param project already created project
+     * @param user name of user to register
+     * @return whether registration was successful
+     */
+    public static boolean register(Connection conn, String project, String user) {
+        try {
+            String query = "INSERT OR REPLACE INTO '" + getEnteredTable(project)
+                    + "'(NAME) VALUES('" + user + "')";
+            Statement create = conn.createStatement();
+            create.execute(query);
+            conn.commit();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Leave a project
+     * @param conn already open connection to database
+     * @param project already created project
+     * @param user user to remove from project
+     * @return whether user was successfully removed
+     */
+    public static boolean leave(Connection conn, String project, String user) {
+        try {
+            String query = "DELETE FROM '" + getEnteredTable(project) + "' WHERE NAME = '" + user + "'";
+            Statement create = conn.createStatement();
+            create.executeUpdate(query);
+            conn.commit();
+        } catch (SQLException e) {
+            return false;
+        }
+        return true;
+    }
+    /**
      * Insert a task into the given project's table of tasks
      *
      * @param conn already open connection to sqlite database
@@ -269,7 +313,7 @@ public class BackEnd {
     }
 
     /**
-     * Each project has a different task project list. Problem queries have their issue characters replaced
+     * Each project has a different task project list.
      * @param projectName project name
      * @return gets the unique task table name for a project
      */
@@ -278,6 +322,14 @@ public class BackEnd {
         return projectName + "_tasks";
     }
 
+    /**
+     * Each project has a different record of who is entered currently.
+     * @param projectName project name
+     * @return gets the unique entered table name for a project
+     */
+    private static String getEnteredTable(String projectName) {
+        return projectName + "_entered";
+    }
     /**
      * Get the number of tasks associated with a project
      * @param conn already open connection to sqlite database
@@ -392,8 +444,13 @@ public class BackEnd {
             e.printStackTrace();
         }
     }
+*/
 
-    void printRowsInTable(Connection conn, String tableName, boolean project_list) {
+    public static void printEntered(Connection conn, String project) {
+        printRowsInTable(conn, getEnteredTable(project), true);
+    }
+
+    public static void printRowsInTable(Connection conn, String tableName, boolean project_list) {
         try {
             String table = tableName;
             if (!project_list) {
@@ -420,7 +477,7 @@ public class BackEnd {
             e.printStackTrace();
         }
     }
-
+/*
     public void removeTasks(Connection conn, String projectName) {
         try {
             String query = "DROP TABLE IF EXISTS " + getTaskTable(projectName);

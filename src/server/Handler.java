@@ -105,11 +105,14 @@ public class Handler {
 
             final Thread tcpServer = new Thread(new TCPThreadedServer(port, cmd.getOptionValue("d")));
             final Thread udpServer = new Thread(new UDPHandler(port, cmd.getOptionValue("d")));
+//            final Thread udpTracker = new Thread(new UDPEventTracker());
             tcpServer.start();
             udpServer.start();
+//            udpTracker.start();
             try {
                 tcpServer.join();
                 udpServer.join();
+//                udpTracker.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

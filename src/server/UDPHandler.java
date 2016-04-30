@@ -86,6 +86,7 @@ public class UDPHandler implements Runnable {
                     terminate();
                 }
             });
+            UDPDecoder udpdec = new UDPDecoder();
 
             while (_running) {
                 try {
@@ -99,7 +100,7 @@ public class UDPHandler implements Runnable {
 //                            packet_address.toString().substring(packet_address.toString().indexOf("/") + 1), packet_port).getBytes();
 
                     Decoder decoder = new Decoder(receive.getData(), 0, receive.getLength());
-                    byte[] reply = ServerDecoder.serverQuery(_dbfile, _sdf, decoder, packet_address.toString().substring(packet_address.toString().indexOf('/') + 1), packet_port);
+                    byte[] reply = udpdec.serverQuery(_dbfile, _sdf, decoder, packet_address, packet_port);
                     // Reply
                     DatagramPacket send = new DatagramPacket(reply, reply.length, receive.getAddress(), receive.getPort());
                     socket.send(send);

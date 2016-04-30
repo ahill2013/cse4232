@@ -96,10 +96,20 @@ public class ClientParser {
                     index += 2;
                     break;
                 case "REGISTER":
-                    //TODO register case
+                    final String enterProject = commands[index + 1];
+                    ASN1Enter asn1e = new ASN1Enter(new EnterLeave(enterProject, true));
+                    byte[] encodedEnter = asn1e.getEncoder().getBytes();
+                    serverCommands.add(encodedEnter);
+                    serverCommandBytes += encodedEnter.length;
+                    index += 2;
                     break;
                 case "LEAVE":
-                    //TODO leave case
+                    final String leaveProject = commands[index + 1];
+                    ASN1Leave asn1l = new ASN1Leave(new EnterLeave(leaveProject, true));
+                    byte[] encodedLeave = asn1l.getEncoder().getBytes();
+                    serverCommands.add(encodedLeave);
+                    serverCommandBytes += encodedLeave.length;
+                    index += 2;
                     break;
                 default:
                     throw new IOException("Unrecognized command");
@@ -138,6 +148,12 @@ public class ClientParser {
                     break;
                 case ASN1Take.TAGVALUE:
                     sb.append(new ASN1Take().decode(dec.getFirstObject(true)).toString());
+                    break;
+                case ASN1Enter.TAGVALUE:
+                    sb.append(new ASN1Enter().decode(dec.getFirstObject(true)).toString());
+                    break;
+                case ASN1Leave.TAGVALUE:
+                    sb.append(new ASN1Leave().decode(dec.getFirstObject(true)).toString());
                     break;
                 default:
                     throw new ASN1DecoderFail("Unrecognized asn1 object");

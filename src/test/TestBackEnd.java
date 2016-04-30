@@ -13,9 +13,9 @@ public class TestBackEnd {
         BackEnd be = null;
         Connection conn = null;
         try {
-            BackEnd.openDatabase("/home/armin1215/Networks/test.db");
+            BackEnd.openDatabase("/home/armin1215/Classes/Networks/test.db");
             //be = new BackEnd("/home/adam/Documents/NP/Milestone 2/server/cse4232/test.db");
-            conn = BackEnd.openConnection("/home/armin1215/Networks/test.db");
+            conn = BackEnd.openConnection("/home/armin1215/Classes/Networks/test.db");
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
@@ -67,6 +67,16 @@ public class TestBackEnd {
 //        catch (SQLException e) {
 //            e.printStackTrace();
 //        }
+
+        if (!BackEnd.register(conn, project, "Jim")) {
+            System.out.println("Failed to register");
+        }
+
+        if (!BackEnd.leave(conn, project, "Jim")) {
+            System.out.println("Failed to leave");
+        }
+
+        BackEnd.printEntered(conn, project);
 
         try {
             BackEnd.closeConnection(conn);

@@ -43,6 +43,7 @@ public class Client {
 
         OptParser parseArgs = new OptParser();
         CommandLine cmd;
+        Thread cl = null;
 
         try {
             cmd = parseArgs.getCMD(m_args);
@@ -81,23 +82,32 @@ public class Client {
                 }
             }
 
+            // display help menu
+            if (cmd.hasOption("h")) {
+                OptParser.printHelpMenu();
+                System.exit(0);
+            }
+
+            // handle conflicting flags
+            if (cmd.hasOption("t") && cmd.hasOption("u")) {
+                System.err.println("Cannot use both 't' and 'u' flags at the same time.");
+                System.err.println("Choose only one.");
+                System.exit(0);
+            }
+
+            DatagramSocket sock = null;
+            if (cmd.hasOption("u")) {
+                try {
+                    sock = new DatagramSocket();
+                } catch (SocketException e) {
+                    System.out.println("Could not open UDP socket on local host");
+                }
+                cl = new Thread(new ClientListener(sock));
+                cl.start();
+            }
             Scanner stdin = new Scanner(System.in);
 
             while (true) {
-
-                // display help menu
-                if (cmd.hasOption("h")) {
-                    OptParser.printHelpMenu();
-                    break;
-                }
-
-                // handle conflicting flags
-                if (cmd.hasOption("t") && cmd.hasOption("u")) {
-                    System.err.println("Cannot use both 't' and 'u' flags at the same time.");
-                    System.err.println("Choose only one.");
-                    break;
-                }
-
                 // read user input
                 String input = stdin.nextLine();
 
@@ -111,10 +121,10 @@ public class Client {
                     serverInput = ClientParser.parseClientInput(input, new SimpleDateFormat("yyyy-MM-dd:hh'h'mm'm'ss's'SSS'Z'"));
 
                     if (cmd.hasOption("d")) {
-                        if (cmd.hasOption("u")) sendCommandUDP(serverInput, cmd.getOptionValue("d"), port);
+                        if (cmd.hasOption("u")) sendCommandUDP(sock, serverInput, cmd.getOptionValue("d"), port);
                         else sendCommandTCP(serverInput, cmd.getOptionValue("d"), port);
                     } else {
-                        if (cmd.hasOption("u")) sendCommandUDP(serverInput, IP, port);
+                        if (cmd.hasOption("u")) sendCommandUDP(sock, serverInput, IP, port);
                         else sendCommandTCP(serverInput, IP, port);
                     }
 
@@ -129,33 +139,40 @@ public class Client {
             }
         } catch (org.apache.commons.cli.ParseException e) {
             e.printStackTrace();
+        } finally {
+            if (cl != null) {
+                cl.interrupt();
+            }
         }
 
     }
 
-    private static void sendCommandUDP(final byte[] input, final String host, final int _port) throws UnknownHostException {
-
+    private static void sendCommandUDP(DatagramSocket sock, final byte[] input, final String host, final int _port) throws UnknownHostException {
+        if (sock == null) {
+            System.err.println("Trying to send UDP command in TCP mode");
+            System.exit(-1);
+        }
         final InetAddress inetAddress = InetAddress.getByName(host);
-        DatagramSocket sock;
         try {
-            byte[] buffer = new byte[4*1024];
-            sock = new DatagramSocket();
+//            byte[] buffer = new byte[4*1024];
+            sock.getPort();
             DatagramPacket send = new DatagramPacket(input, input.length, inetAddress, _port);
             sock.send(send);
 
-            DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
-            sock.receive(receipt);
-
-            Decoder rec = new Decoder(receipt.getData(), 0, receipt.getLength());
-            ClientParser.printClientOutput(rec);
+//            DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
+//            sock.receive(receipt);
+//
+//            Decoder rec = new Decoder(receipt.getData(), 0, receipt.getLength());
+//            ClientParser.printClientOutput(rec);
         } catch (SocketException e) {
             System.out.println("Could not connect to remote host");
         } catch (IOException e) {
             System.out.println("Network error");
             e.printStackTrace();
-        } catch (ASN1DecoderFail e) {
-            System.out.println("Could not decode asn1");
         }
+//        } catch (ASN1DecoderFail e) {
+//            System.out.println("Could not decode asn1");
+//        }
     }
 
     private static synchronized void sendCommandTCP(final byte[] input, final String host, final int port) {

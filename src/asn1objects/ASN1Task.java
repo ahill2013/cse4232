@@ -10,6 +10,7 @@ import net.ddp2p.ASN1.Encoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Single task that is part of a project
@@ -66,6 +67,8 @@ public class ASN1Task extends ASNObj {
     @Override
     public Task decode(Decoder decoder) throws ASN1DecoderFail {
         final Decoder dec = decoder.getContent();
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         String name = dec.getFirstObject(true).getString(Encoder.TAG_UTF8String);
         Date start = new Date(Long.parseLong(dec.getFirstObject(true).getGeneralizedTime(Encoder.TAG_GeneralizedTime)));

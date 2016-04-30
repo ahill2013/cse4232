@@ -35,6 +35,7 @@ public class ProjectReporter {
 
         Date d = new Date();
         long time = t.getStartTime().getTime() - d.getTime();
+
         if (time > 0 && time < 3600000) {
             if (t.getStartTime().getTime() > latest) {
                 latest = t.getStartTime().getTime();

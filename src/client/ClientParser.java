@@ -24,7 +24,6 @@ public class ClientParser {
      * @throws SQLException if connection fails to close
      */
     public static synchronized byte[] parseClientInput(final String input, SimpleDateFormat sdf) throws IndexOutOfBoundsException, IOException, ParseException{
-
         int serverCommandBytes = 0;
         LinkedList<byte[]> serverCommands = new LinkedList<>();
 

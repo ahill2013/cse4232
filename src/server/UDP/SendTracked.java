@@ -1,3 +1,24 @@
+/* ------------------------------------------------------------------------- */
+/*   Copyright (C) 2016
+                Author:  wnyffenegger2013@my.fit.edu
+                Author:  ahill2013@my.fit.edu
+                Florida Tech, Computer Science
+
+       This program is free software; you can redistribute it and/or modify
+       it under the terms of the GNU Affero General Public License as published by
+       the Free Software Foundation; either the current version of the License, or
+       (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
+/* ------------------------------------------------------------------------- */
+
 package server.UDP;
 
 import asn1objects.ASN1Project;
@@ -17,7 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
- * Created by armin1215 on 4/29/16.
+ * A task to be reported at a specific time. Each instance is added to a Timer.
  */
 public class SendTracked extends TimerTask implements Runnable {
     private Project _p;
@@ -27,6 +48,10 @@ public class SendTracked extends TimerTask implements Runnable {
         _p.addTask(t);
         _t = t;
     }
+
+    /**
+     * Send a UDP packet to the client containing the task
+     */
     @Override
     public void run() {
         try {

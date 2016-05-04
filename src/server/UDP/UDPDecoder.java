@@ -1,3 +1,24 @@
+/* ------------------------------------------------------------------------- */
+/*   Copyright (C) 2016
+                Author:  wnyffenegger2013@my.fit.edu
+                Author:  ahill2013@my.fit.edu
+                Florida Tech, Computer Science
+
+       This program is free software; you can redistribute it and/or modify
+       it under the terms of the GNU Affero General Public License as published by
+       the Free Software Foundation; either the current version of the License, or
+       (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU Affero General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
+/* ------------------------------------------------------------------------- */
+
 package server.UDP;
 
 import asn1objects.*;
@@ -295,6 +316,14 @@ public class UDPDecoder {
         return 0;
     }
 
+    /**
+     * Deregister a client from listening to scheduled tasks by cancelling all scheduled reports for the client
+     * concerning that particular project.
+     * @param el enter leave object with list of projects to stop listening to
+     * @param ip remote host of the client
+     * @param port remote port number
+     * @return 0 for successful execution
+     */
     private int executeLeave(EnterLeave el, InetAddress ip, int port) {
         Iterator<UDPEventTracker> trackers = _udpet.iterator();
         while (trackers.hasNext()) {
@@ -324,6 +353,10 @@ public class UDPDecoder {
         }
     }
 
+    /**
+     * If the list of tracked projects has not been updated in the last 10 minutes then go through and remove
+     * all expired tracked projects and update all projects for the tasks completed.
+     */
     private void checkStatusTrackers() {
         long x = System.currentTimeMillis() - lastupdate;
         if (timetoupdate < x) {

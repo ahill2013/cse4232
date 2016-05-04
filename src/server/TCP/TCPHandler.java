@@ -19,9 +19,10 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server;
+package server.TCP;
 
 import net.ddp2p.ASN1.Decoder;
+import server.TCP.TCPDecoder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

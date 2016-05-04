@@ -1,4 +1,4 @@
-package server;
+package server.UDP;
 
 import asn1objects.ASN1Project;
 import asn1objects.ASN1Task;

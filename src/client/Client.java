@@ -37,6 +37,12 @@ import java.util.Scanner;
 
 public class Client {
 
+    /**
+     * Set up the client and begin listening on standard input for commands and receiving replies.
+     * @param args
+     * @throws UnknownHostException host to send to does not exist
+     * @throws ParseException options entered are incorrect
+     */
     public static synchronized void main (final String args[]) throws UnknownHostException, ParseException {
 
         String m_args[] = args;
@@ -148,6 +154,15 @@ public class Client {
 
     }
 
+    /**
+     * Send a UDP command along an already open socket
+     *
+     * @param sock already opened UDP socket
+     * @param input formatted ans1 byte array
+     * @param host host of the remote server
+     * @param _port port of the remote server
+     * @throws UnknownHostException the host of the remote server does not exist
+     */
     private static void sendCommandUDP(DatagramSocket sock, final byte[] input, final String host, final int _port) throws UnknownHostException {
         if (sock == null) {
             System.err.println("Trying to send UDP command in TCP mode");
@@ -155,27 +170,26 @@ public class Client {
         }
         final InetAddress inetAddress = InetAddress.getByName(host);
         try {
-//            byte[] buffer = new byte[4*1024];
+            // Send the command after opening the port, check whether the socket is open
             sock.getPort();
             DatagramPacket send = new DatagramPacket(input, input.length, inetAddress, _port);
             sock.send(send);
 
-//            DatagramPacket receipt = new DatagramPacket(buffer, buffer.length);
-//            sock.receive(receipt);
-//
-//            Decoder rec = new Decoder(receipt.getData(), 0, receipt.getLength());
-//            ClientParser.printClientOutput(rec);
         } catch (SocketException e) {
             System.out.println("Could not connect to remote host");
         } catch (IOException e) {
             System.out.println("Network error");
             e.printStackTrace();
         }
-//        } catch (ASN1DecoderFail e) {
-//            System.out.println("Could not decode asn1");
-//        }
     }
 
+    /**
+     * Take a command from the input and send it through TCP
+     *
+     * @param input the formatted input to send
+     * @param host the location of the socket to send
+     * @param port the location of the port to send
+     */
     private static synchronized void sendCommandTCP(final byte[] input, final String host, final int port) {
 
         byte[] ASNresponse = new byte[32768];
@@ -194,6 +208,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ASN1DecoderFail asn1DecoderFail) {
+            // Catch a decoder fail which should not happen
             asn1DecoderFail.printStackTrace();
         }
     }

@@ -1,4 +1,4 @@
-package server;
+package server.UDP;
 
 import datatypes.Task;
 

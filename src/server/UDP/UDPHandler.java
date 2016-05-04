@@ -19,7 +19,7 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server;
+package server.UDP;
 
 import net.ddp2p.ASN1.Decoder;
 
@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 
 /**
  * Handles receiving and replying to all UDP packets sent to server. Receives a maximum buffer of
- * 2^15 bytes; however, such size is not recommended because the reply may be significantly longer and cause
+ * 2^12 bytes; however, such size is not recommended because the reply may be significantly longer and cause
  * the UDP Handler to raise an exception.
  *
  * Implements Runnable with methods run() and terminate()
@@ -86,6 +86,8 @@ public class UDPHandler implements Runnable {
                     terminate();
                 }
             });
+
+            // Decodes all of the udp packets and maintain the responses to registered clients
             UDPDecoder udpdec = new UDPDecoder();
 
             while (_running) {

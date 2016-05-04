@@ -1,10 +1,11 @@
-package server;
+package server.UDP;
 
 import asn1objects.*;
 import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 import org.apache.http.util.ByteArrayBuffer;
+import server.Database.BackEnd;
 
 import java.net.InetAddress;
 import java.sql.Connection;
@@ -40,6 +41,10 @@ public class UDPDecoder {
      * each successfully decoded server query as a series of successes or failures.
      * After the outcomes, comes either straightforward replies to the request or a
      * reiteration of the request.
+     *
+     * Records all of the registered and leave commands sent by clients as well as a record of those requests.
+     * It cancels those requests on command and schedules them.
+     *
      * @param _dbfile location of the database on the local system
      * @param sdf format for dates entered into the database
      * @param dec already created decoder
@@ -260,7 +265,17 @@ public class UDPDecoder {
         return p;
     }
 
-
+    /**
+     * Schedule all tasks finishing in an hour from every project named in an enter-leave object
+     * to be sent to the respective client from which the enter leave object originated.
+     *
+     * @param conn already opened connection to a database
+     * @param sdf desired simple date format
+     * @param el enter leave object
+     * @param ip ip that object was sent from
+     * @param port port that object was sent from
+     * @return 0 for successfully scheduled all tasks occurring in next hour to occur
+     */
     private int executeEnter(Connection conn, SimpleDateFormat sdf, EnterLeave el, InetAddress ip, int port) {
         UDPEventTracker etracker = new UDPEventTracker(ip, port);
         try {

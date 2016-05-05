@@ -19,9 +19,10 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server.UDP;
+package server;
 
 import net.ddp2p.ASN1.Decoder;
+import server.UDPDecoder;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

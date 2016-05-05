@@ -19,23 +19,19 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server.UDP;
+package server;
 
 import asn1objects.ASN1Project;
-import asn1objects.ASN1Task;
 import datatypes.Project;
 import datatypes.Task;
 
-import java.util.LinkedList;
 import java.util.TimerTask;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 
 /**
  * A task to be reported at a specific time. Each instance is added to a Timer.

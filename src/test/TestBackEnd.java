@@ -1,6 +1,6 @@
 package test;
 
-import server.Database.BackEnd;
+import server.BackEnd;
 
 import java.sql.Connection;
 import java.sql.SQLException;

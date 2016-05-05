@@ -12,19 +12,38 @@ CLSDIR = bin/
 EXT = externals/
 CLIENTDIR = client/
 SERVERDIR = server/
+TCPDIR = server/TCP/
+UDPDIR = server/UDP/
+DATABASE = server/Database
 ASN1ODIR = asn1objects/
 ASN1DIR = net/ddp2p/ASN1/
 DATATYPEDIR = datatypes/
 CLSS = $(addprefix ${CLSDIR}${SERVERDIR},Parser.class BackEnd.class TCPHandler.class \
-        TCPThreadedServer.class UDPHandler.class Handler.class ServerDecoder.class)
+        TCPThreadedServer.class UDPHandler.class Handler.class TCPDecoder.class UDPDecoder.class)
+
+CLSC = $(addprefix ${CLSDIR}${CLIENTDIR},OptParser.class ClientParser.class ClientListener.class Client.class)
 
 JDBC_DEST = ${CLSDIR}${JDBC}
 CLI_DEST = ${CLSDIR}${CLI}
 CORE_DEST = ${CLSDIR}${CORE}
 
-.PHONY: all asn1 client datatypes asn1objects clean
+.PHONY: all asn1 datatypes asn1objects clean
 
-all: ${CLSDIR} asn1 datatypes asn1objects $(CLSS) client | ${CLSDIR}
+all: ${CLSDIR} asn1 datatypes asn1objects $(CLSS) $(CLSC) | ${CLSDIR}
+${CLSDIR}${SERVERDIR}SendTracked.class: ${CLSDIR} asn1 datatypes $(addprefix ${SRCDIR}${SERVERDIR},SendTracked.java) | ${CLSDIR}
+    $(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}SendTracked.java
+
+${CLSDIR}${SERVERDIR}ProjectReporter.class: ${CLSDIR} datatypes | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}ProjectReporter.java
+
+${CLSDIR}${SERVERDIR}UDPEventTracker.class: ${CLSDIR} datatypes $(addprefix ${SRCDIR}${SERVERDIR},ProjectReporter.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}UDPEventTracker.java
+
+${CLSDIR}${SERVERDIR}UDPDecoder.class: ${CLSDIR} asn1 datatypes asn1objects $(addprefix ${SRCDIR}${SERVERDIR},UDPEventTracker.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}UDPDecoder.java
+
+${CLSDIR}${SERVERDIR}TCPDecoder.class: ${CLSDIR} asn1objects datatypes | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}TCPDecoder.java
 
 ${CLSDIR}${SERVERDIR}TCPHandler.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SERVERDIR},TCPHandler.java) | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}TCPHandler.java
@@ -32,7 +51,7 @@ ${CLSDIR}${SERVERDIR}TCPHandler.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SER
 ${CLSDIR}${SERVERDIR}TCPThreadedServer.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SERVERDIR},TCPThreadedServer.java TCPHandler.java) | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}TCPThreadedServer.java
 
-${CLSDIR}${SERVERDIR}UDPHandler.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SERVERDIR},UDPHandler.java ServerDecoder.java) | ${CLSDIR}
+${CLSDIR}${SERVERDIR}UDPHandler.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SERVERDIR},UDPHandler.java UDPDecoder.java) | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}UDPHandler.java
 
 ${CLSDIR}${SERVERDIR}Handler.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${SERVERDIR},Handler.java Parser.java BackEnd.java TCPThreadedServer.java UDPHandler.java) | ${CLSDIR}
@@ -44,8 +63,17 @@ ${CLSDIR}${SERVERDIR}Parser.class: ${CLSDIR} ${SRCDIR}${SERVERDIR}Parser.java | 
 ${CLSDIR}${SERVERDIR}BackEnd.class: ${CLSDIR} ${SRCDIR}${SERVERDIR}BackEnd.java | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${JDBC_DEST} ${SRCDIR}${SERVERDIR}BackEnd.java
 
-${CLSDIR}${SERVERDIR}ServerDecoder.class: ${CLSDIR} asn1objects datatypes | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}ServerDecoder.java
+${CLSDIR}${CLIENTDIR}OptParser.class: ${CLSDIR} ${SRCDIR}${CLIENTDIR}OptParser.java | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CLI_DEST} ${SRCDIR}${CLIENTDIR}OptParser.java
+
+${CLSDIR}${CLIENTDIR}ClientListener.class: ${CLSDIR} asn1 asn1objects $(addprefix ${SRCDIR}${CLIENTDIR},ClientListener.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${CLIENTDIR}ClientListener.java
+
+${CLSDIR}${CLIENTDIR}ClientParser.class: ${CLSDIR} asn1 asn1objects datatypes $(addprefix ${SRCDIR}${CLIENTDIR},ClientParser.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${CLIENTDIR}ClientParser.java
+
+${CLSDIR}${CLIENTDIR}Client.class: ${CLSDIR} asn1 $(addprefix ${SRCDIR}${CLIENTDIR},Client.java ClientParser.java ClientListener.java) | ${CLSDIR}
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${CLI_DEST}:${SRCDIR} ${SRCDIR}${CLIENTDIR}Client.java
 
 asn1: ${CLSDIR} | ${CLSDIR}
 	$(JC) -d ${CLSDIR} -cp ${SRCDIR} ${SRCDIR}${ASN1DIR}ASN1_Util.java ${SRCDIR}${ASN1DIR}ASN1DecoderFail.java \
@@ -66,9 +94,10 @@ datatypes: ${CLSDIR} | ${CLSDIR}
 		${SRCDIR}${DATATYPEDIR}Task.java
 
 client: ${CLSDIR} asn1objects datatypes | ${CLSDIR}
-	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${CLIENTDIR}Client.java ${SRCDIR}${CLIENTDIR}ClientParser.java
+	$(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${CLIENTDIR}Client.java ${SRCDIR}${CLIENTDIR}ClientParser.java ${SRCDIR}${CLIENTDIR}ClientListener.java ${SRCDIR}${CLIENTDIR}OptParser.java
 
 ${CLSDIR}:
+	${MKDIR} ${CLSDIR}
 	${MKDIR} ${CLSDIR}${EXT}
 	${MKDIR} ${CLSDIR}${CLIENTDIR}
 	${MKDIR} ${CLSDIR}${SERVERDIR}

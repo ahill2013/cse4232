@@ -19,9 +19,9 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server.TCP;
+package server;
 
-import server.TCP.TCPHandler;
+import server.TCPHandler;
 
 import java.io.IOException;
 import java.net.BindException;

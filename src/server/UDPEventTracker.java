@@ -19,7 +19,7 @@
       Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              */
 /* ------------------------------------------------------------------------- */
 
-package server.UDP;
+package server;
 
 import datatypes.Task;
 

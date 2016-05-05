@@ -5,7 +5,6 @@ import datatypes.*;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 import org.apache.http.util.ByteArrayBuffer;
-import server.BackEnd;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -144,7 +143,7 @@ public class TCPDecoder {
         ByteArrayBuffer baf = new ByteArrayBuffer(numBytes);
 
         for (byte[] response : responses) {
-            baf.append(response,0,response.length);
+            baf.append(response, 0, response.length);
         }
 
         return baf.toByteArray();

@@ -30,6 +30,7 @@ CORE_DEST = ${CLSDIR}${CORE}
 .PHONY: all asn1 datatypes asn1objects clean
 
 all: ${CLSDIR} asn1 datatypes asn1objects $(CLSS) $(CLSC) | ${CLSDIR}
+
 ${CLSDIR}${SERVERDIR}SendTracked.class: ${CLSDIR} asn1 datatypes $(addprefix ${SRCDIR}${SERVERDIR},SendTracked.java) | ${CLSDIR}
     $(JC) -d ${CLSDIR} -cp ${CORE_DEST}:${SRCDIR} ${SRCDIR}${SERVERDIR}SendTracked.java
 

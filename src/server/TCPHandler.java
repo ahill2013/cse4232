@@ -22,7 +22,6 @@
 package server;
 
 import net.ddp2p.ASN1.Decoder;
-import server.TCPDecoder;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -120,6 +119,10 @@ public class TCPHandler implements Runnable {
 
                 // Decode and reply
                 Decoder dec = new Decoder(input, 0, inputSize);
+                if (!dec.fetchAll(reader)) {
+                    System.out.println("Buffer too small or stream closed");
+                    continue;
+                }
                 dec.getFirstObject(true);
                 byte[] output = TCPDecoder.serverQuery(_dbfile, _sdf, dec, IP, clientPort);
 

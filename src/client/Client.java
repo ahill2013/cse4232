@@ -21,6 +21,9 @@
 
 package client;
 
+import asn1objects.ASN1Enter;
+import asn1objects.ASN1Leave;
+import datatypes.EnterLeave;
 import net.ddp2p.ASN1.ASN1DecoderFail;
 import net.ddp2p.ASN1.Decoder;
 
@@ -101,24 +104,50 @@ public class Client {
                 System.exit(0);
             }
 
+
             DatagramSocket sock = null;
-            if (cmd.hasOption("u")) {
+            if (cmd.hasOption("u") || cmd.hasOption("r")) {
                 try {
                     sock = new DatagramSocket();
+
+                    cl = new Thread(new ClientListener(sock));
+                    cl.start();
+
+                    if (cmd.hasOption("r")) {
+                        EnterLeave register = new EnterLeave(cmd.getOptionValue("r"), true);
+                        byte[] reg = new ASN1Enter(register).getEncoder().getBytes();
+                        DatagramPacket enter = new DatagramPacket(reg, reg.length, InetAddress.getByName(IP), port);
+                        sock.send(enter);
+                    }
                 } catch (SocketException e) {
                     System.out.println("Could not open UDP socket on local host");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                cl = new Thread(new ClientListener(sock));
-                cl.start();
+
             }
             Scanner stdin = new Scanner(System.in);
 
-            while (true) {
+            boolean running = true;
+            while (running) {
                 // read user input
                 String input = stdin.nextLine();
 
                 // Get out of program
                 if (input.equals("EXIT")) {
+                    if (cmd.hasOption("r")) {
+                        try {
+                            EnterLeave leave = new EnterLeave(cmd.getOptionValue("r"), true);
+                            byte[] serverInput = new ASN1Leave(leave).getEncoder().getBytes();
+                            DatagramPacket l = new DatagramPacket(serverInput, serverInput.length, InetAddress.getByName(IP), port);
+                            sendCommandUDP(sock, serverInput, cmd.getOptionValue("d"), port);
+                        } catch (IOException e) {
+                            System.err.println("Failed to send leave message to server");
+                            e.printStackTrace();
+                        }
+                    }
+                    running = false;
                     break;
                 }
 
@@ -128,14 +157,14 @@ public class Client {
 
 
                     if (cmd.hasOption("d")) {
-                        if (cmd.hasOption("u")) sendCommandUDP(sock, serverInput, cmd.getOptionValue("d"), port);
+                        if (cmd.hasOption("u") || cmd.hasOption("r")) sendCommandUDP(sock, serverInput, cmd.getOptionValue("d"), port);
                         else sendCommandTCP(serverInput, cmd.getOptionValue("d"), port);
                     } else {
-                        if (cmd.hasOption("u")) sendCommandUDP(sock, serverInput, IP, port);
+                        if (cmd.hasOption("u") || cmd.hasOption("r")) sendCommandUDP(sock, serverInput, IP, port);
                         else sendCommandTCP(serverInput, IP, port);
                     }
 
-                } catch (Exception e) {
+                } catch (IOException e) {
                     System.out.println("Poor Command entered");
                     System.out.println(e.getMessage());
                     continue;

@@ -331,10 +331,9 @@ public class UDPDecoder {
                 tracker.remove(el.getProjects());
 
                 trackers.remove();
-                return 0;
             }
         }
-        return FAILURE;
+        return 0;
     }
 
     /**

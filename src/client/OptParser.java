@@ -41,7 +41,7 @@ public class OptParser {
         opts.addOption(Option.builder("t").required(false).hasArg(false).optionalArg(false).desc("use TCP (default)").build());
         opts.addOption(Option.builder("u").required(false).hasArg(false).optionalArg(false).desc("use UDP").build());
         opts.addOption(Option.builder("d").required(false).hasArg(true).longOpt("domain").argName("domain/host name").desc("specify the domain/host name").build());
-
+        opts.addOption(Option.builder("r").required(false).hasArg(true).optionalArg(false).desc("register for an exam on startup").build());
         parser = OptParser.getDefaultParser();
 
     }

@@ -98,7 +98,7 @@ public class Client {
             }
 
             // handle conflicting flags
-            if ((cmd.hasOption("t") && cmd.hasOption("u")) || (cmd.hasOption("t") && cmd.hasOption("u")) || (cmd.hasOption("u") && cmd.hasOption("r"))) {
+            if ((cmd.hasOption("t") && cmd.hasOption("u")) || (cmd.hasOption("u") && cmd.hasOption("r"))) {
                 System.err.println("Cannot use both 't' and 'u' flags at the same time.");
                 System.err.println("Choose only one.");
                 System.exit(0);
